@@ -77,3 +77,52 @@ impl PartialEq for FieldElement {
 }
 
 impl Eq for FieldElement {}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_add() {
+        let a = FieldElement::new(2, 31).unwrap();
+        let b = FieldElement::new(15, 31).unwrap();
+        assert_eq!(a.add(&b).unwrap(), FieldElement::new(17, 31).unwrap());
+        let a = FieldElement::new(17, 31).unwrap();
+        let b = FieldElement::new(21, 31).unwrap();
+        assert_eq!(a.add(&b).unwrap(), FieldElement::new(7, 31).unwrap());
+    }
+
+    #[test]
+    fn test_sub() {
+        let a = FieldElement::new(29, 31).unwrap();
+        let b = FieldElement::new(4, 31).unwrap();
+        assert_eq!(a.sub(&b).unwrap(), FieldElement::new(25, 31).unwrap());
+        let a = FieldElement::new(15, 31).unwrap();
+        let b = FieldElement::new(30, 31).unwrap();
+        assert_eq!(a.add(&b).unwrap(), FieldElement::new(16, 31).unwrap());
+    }
+    /*
+    #[test]
+    fn test_mul() {
+      let a = FieldElement::new(7, 13).unwrap();
+      let b = FieldElement::new(12, 13).unwrap();
+      let c = FieldElement::new(10, 13).unwrap();
+      assert_eq!(a.mul(&b).unwrap(), c);
+    }
+
+    #[test]
+    fn test_pow() {
+      let a = FieldElement::new(7, 13).unwrap();
+      let exponent = 3;
+      let c = FieldElement::new(5, 13).unwrap();
+      assert_eq!(a.pow(exponent).unwrap(), c);
+    }
+
+    #[test]
+    fn test_div() {
+      let a = FieldElement::new(7, 13).unwrap();
+      let b = FieldElement::new(12, 13).unwrap();
+      let c = FieldElement::new(8, 13).unwrap();
+      assert_eq!(a.div(&b).unwrap(), c);
+    }*/
+}
