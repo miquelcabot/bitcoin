@@ -8,14 +8,14 @@ fn modulo(a: i32, b: i32) -> i32 {
 }
 
 #[derive(Debug)]
-struct FieldElement {
+pub struct FieldElement {
     num: i32,
     prime: i32,
 }
 
 impl FieldElement {
     // Constructs a new FieldElement, ensuring the value is within the field range
-    fn new(num: i32, prime: i32) -> Result<Self, String> {
+    pub fn new(num: i32, prime: i32) -> Result<Self, String> {
         if num >= prime || num < 0 {
             let error = format!("Num {} not in field range 0 to {}", num, prime - 1);
             return Err(error);
@@ -24,7 +24,7 @@ impl FieldElement {
     }
 
     // Adds two FieldElement values
-    fn add(&self, other: &FieldElement) -> Result<Self, String> {
+    pub fn add(&self, other: &FieldElement) -> Result<Self, String> {
         if self.prime != other.prime {
             return Err("Cannot add two numbers in different Fields".to_string());
         }
@@ -33,7 +33,7 @@ impl FieldElement {
     }
 
     // Subtracts two FieldElement values
-    fn sub(&self, other: &FieldElement) -> Result<Self, String> {
+    pub fn sub(&self, other: &FieldElement) -> Result<Self, String> {
         if self.prime != other.prime {
             return Err("Cannot subtract two numbers in different Fields".to_string());
         }
@@ -42,7 +42,7 @@ impl FieldElement {
     }
 
     // Multiplies two FieldElement values
-    fn mul(&self, other: &FieldElement) -> Result<Self, String> {
+    pub fn mul(&self, other: &FieldElement) -> Result<Self, String> {
         if self.prime != other.prime {
             return Err("Cannot multiply two numbers in different Fields".to_string());
         }
@@ -51,14 +51,14 @@ impl FieldElement {
     }
 
     // Exponentiates a FieldElement value
-    fn pow(&self, exponent: i32) -> Result<Self, String> {
+    pub fn pow(&self, exponent: i32) -> Result<Self, String> {
         let n = modulo(exponent, self.prime - 1);
         let num = modulo(self.num.pow(n as u32), self.prime);
         FieldElement::new(num, self.prime)
     }
 
     // Divides one FieldElement by another using Fermat's Little Theorem
-    fn div(&self, other: &FieldElement) -> Result<Self, String> {
+    pub fn div(&self, other: &FieldElement) -> Result<Self, String> {
         if self.prime != other.prime {
             return Err("Cannot divide two numbers in different Fields".to_string());
         }
@@ -99,17 +99,16 @@ mod tests {
         assert_eq!(a.sub(&b).unwrap(), FieldElement::new(25, 31).unwrap());
         let a = FieldElement::new(15, 31).unwrap();
         let b = FieldElement::new(30, 31).unwrap();
-        assert_eq!(a.add(&b).unwrap(), FieldElement::new(16, 31).unwrap());
-    }
-    /*
-    #[test]
-    fn test_mul() {
-      let a = FieldElement::new(7, 13).unwrap();
-      let b = FieldElement::new(12, 13).unwrap();
-      let c = FieldElement::new(10, 13).unwrap();
-      assert_eq!(a.mul(&b).unwrap(), c);
+        assert_eq!(a.sub(&b).unwrap(), FieldElement::new(16, 31).unwrap());
     }
 
+    #[test]
+    fn test_mul() {
+        let a = FieldElement::new(24, 31).unwrap();
+        let b = FieldElement::new(19, 31).unwrap();
+        assert_eq!(a.mul(&b).unwrap(), FieldElement::new(22, 31).unwrap());
+    }
+    /*
     #[test]
     fn test_pow() {
       let a = FieldElement::new(7, 13).unwrap();
