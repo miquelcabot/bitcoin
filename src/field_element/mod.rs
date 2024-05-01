@@ -108,20 +108,30 @@ mod tests {
         let b = FieldElement::new(19, 31).unwrap();
         assert_eq!(a.mul(&b).unwrap(), FieldElement::new(22, 31).unwrap());
     }
-    /*
+
     #[test]
     fn test_pow() {
-      let a = FieldElement::new(7, 13).unwrap();
-      let exponent = 3;
-      let c = FieldElement::new(5, 13).unwrap();
-      assert_eq!(a.pow(exponent).unwrap(), c);
+        let a = FieldElement::new(17, 31).unwrap();
+        assert_eq!(a.pow(3).unwrap(), FieldElement::new(15, 31).unwrap());
+        let a = FieldElement::new(5, 31).unwrap();
+        let b = FieldElement::new(18, 31).unwrap();
+        assert_eq!(
+            a.pow(5).unwrap().mul(&b).unwrap(),
+            FieldElement::new(16, 31).unwrap()
+        );
     }
 
     #[test]
     fn test_div() {
-      let a = FieldElement::new(7, 13).unwrap();
-      let b = FieldElement::new(12, 13).unwrap();
-      let c = FieldElement::new(8, 13).unwrap();
-      assert_eq!(a.div(&b).unwrap(), c);
-    }*/
+        let a = FieldElement::new(3, 31).unwrap();
+        let b = FieldElement::new(24, 31).unwrap();
+        assert_eq!(a.div(&b).unwrap(), FieldElement::new(4, 31).unwrap());
+        /*
+         a = FieldElement(17, 31)
+         self.assertEqual(a**-3, FieldElement(29, 31))
+         a = FieldElement(4, 31)
+         b = FieldElement(11, 31)
+         self.assertEqual(a**-4 * b, FieldElement(13, 31))
+        */
+    }
 }
