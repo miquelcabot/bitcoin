@@ -1,3 +1,13 @@
+fn modulo(a: i32, b: i32) -> i32 {
+    let r = a % b;
+    if r < 0 {
+        r + b.abs()
+    } else {
+        r
+    }
+}
+
+#[derive(Debug)]
 struct FieldElement {
     num: i32,
     prime: i32,
@@ -18,7 +28,7 @@ impl FieldElement {
         if self.prime != other.prime {
             return Err("Cannot add two numbers in different Fields".to_string());
         }
-        let num = (self.num + other.num) % self.prime;
+        let num = modulo(self.num + other.num, self.prime);
         FieldElement::new(num, self.prime)
     }
 
@@ -27,7 +37,7 @@ impl FieldElement {
         if self.prime != other.prime {
             return Err("Cannot subtract two numbers in different Fields".to_string());
         }
-        let num = (self.num - other.num + self.prime) % self.prime; // Ensuring positive result
+        let num = modulo(self.num - other.num + self.prime, self.prime); // Ensuring positive result
         FieldElement::new(num, self.prime)
     }
 
@@ -36,14 +46,14 @@ impl FieldElement {
         if self.prime != other.prime {
             return Err("Cannot multiply two numbers in different Fields".to_string());
         }
-        let num = (self.num * other.num) % self.prime;
+        let num = modulo(self.num * other.num, self.prime);
         FieldElement::new(num, self.prime)
     }
 
     // Exponentiates a FieldElement value
     fn pow(&self, exponent: i32) -> Result<Self, String> {
-        let n = exponent % (self.prime - 1);
-        let num = self.num.pow(n as u32) % self.prime;
+        let n = modulo(exponent, self.prime - 1);
+        let num = modulo(self.num.pow(n as u32), self.prime);
         FieldElement::new(num, self.prime)
     }
 
@@ -53,8 +63,8 @@ impl FieldElement {
             return Err("Cannot divide two numbers in different Fields".to_string());
         }
         // Calculate other's multiplicative inverse using Fermat's Little Theorem
-        let inv = other.num.pow((self.prime - 2) as u32) % self.prime;
-        let num = (self.num * inv) % self.prime;
+        let inv = modulo(other.num.pow((self.prime - 2) as u32), self.prime);
+        let num = modulo(self.num * inv, self.prime);
         FieldElement::new(num, self.prime)
     }
 }
