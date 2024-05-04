@@ -1,32 +1,5 @@
 // use std::ops;
 
-fn modulo(a: i64, b: i64) -> i64 {
-    let r = a % b;
-    if r < 0 {
-        r + b.abs()
-    } else {
-        r
-    }
-}
-
-fn mod_pow(x: i64, y: i64, z: i64) -> i64 {
-    if z == 1 {
-        return 0;
-    }
-    let mut result = 1;
-    let mut base = x % z;
-    let mut exponent = y;
-
-    while exponent > 0 {
-        if exponent % 2 == 1 {
-            result = result * base % z;
-        }
-        exponent = exponent >> 1;
-        base = base * base % z;
-    }
-    result
-}
-
 #[derive(Debug)]
 pub struct FieldElement {
     num: i64,
@@ -56,7 +29,7 @@ impl FieldElement {
         if self.prime != other.prime {
             return Err("Cannot add two numbers in different Fields".to_string());
         }
-        let num = modulo(self.num + other.num, self.prime);
+        let num = Self::modulo(self.num + other.num, self.prime);
         FieldElement::new(num, self.prime)
     }
 
@@ -65,7 +38,7 @@ impl FieldElement {
         if self.prime != other.prime {
             return Err("Cannot subtract two numbers in different Fields".to_string());
         }
-        let num = modulo(self.num - other.num + self.prime, self.prime); // Ensuring positive result
+        let num = Self::modulo(self.num - other.num + self.prime, self.prime); // Ensuring positive result
         FieldElement::new(num, self.prime)
     }
 
@@ -74,14 +47,14 @@ impl FieldElement {
         if self.prime != other.prime {
             return Err("Cannot multiply two numbers in different Fields".to_string());
         }
-        let num = modulo(self.num * other.num, self.prime);
+        let num = Self::modulo(self.num * other.num, self.prime);
         FieldElement::new(num, self.prime)
     }
 
     // Exponentiates a FieldElement value
     pub fn pow(&self, exponent: i64) -> Result<Self, String> {
-        let n = modulo(exponent, self.prime - 1);
-        let num = mod_pow(self.num, n, self.prime);
+        let n = Self::modulo(exponent, self.prime - 1);
+        let num = Self::mod_pow(self.num, n, self.prime);
         FieldElement::new(num, self.prime)
     }
 
@@ -91,9 +64,36 @@ impl FieldElement {
             return Err("Cannot divide two numbers in different Fields".to_string());
         }
         // Calculate other's multiplicative inverse using Fermat's Little Theorem
-        let inv = mod_pow(other.num, self.prime - 2, self.prime);
-        let num = modulo(self.num * inv, self.prime);
+        let inv = Self::mod_pow(other.num, self.prime - 2, self.prime);
+        let num = Self::modulo(self.num * inv, self.prime);
         FieldElement::new(num, self.prime)
+    }
+
+    fn modulo(a: i64, b: i64) -> i64 {
+        let r = a % b;
+        if r < 0 {
+            r + b.abs()
+        } else {
+            r
+        }
+    }
+
+    fn mod_pow(x: i64, y: i64, z: i64) -> i64 {
+        if z == 1 {
+            return 0;
+        }
+        let mut result = 1;
+        let mut base = x % z;
+        let mut exponent = y;
+
+        while exponent > 0 {
+            if exponent % 2 == 1 {
+                result = result * base % z;
+            }
+            exponent = exponent >> 1;
+            base = base * base % z;
+        }
+        result
     }
 }
 
