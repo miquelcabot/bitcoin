@@ -1,18 +1,8 @@
-// use std::ops;
-
 #[derive(Debug)]
 pub struct FieldElement {
     num: i64,
     prime: i64,
 }
-
-/*impl ops::Add for FieldElement {
-    type Output = Self;
-
-    fn add(self, other: Self) -> Self::Output {
-        self.add(&other)
-    }
-}*/
 
 impl FieldElement {
     // Constructs a new FieldElement, ensuring the value is within the field range
