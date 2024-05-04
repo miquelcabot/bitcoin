@@ -1,4 +1,4 @@
-use std::ops;
+// use std::ops;
 
 fn modulo(a: i64, b: i64) -> i64 {
     let r = a % b;
@@ -7,6 +7,24 @@ fn modulo(a: i64, b: i64) -> i64 {
     } else {
         r
     }
+}
+
+fn mod_pow(x: i64, y: i64, z: i64) -> i64 {
+    if z == 1 {
+        return 0;
+    }
+    let mut result = 1;
+    let mut base = x % z;
+    let mut exponent = y;
+
+    while exponent > 0 {
+        if exponent % 2 == 1 {
+            result = result * base % z;
+        }
+        exponent = exponent >> 1;
+        base = base * base % z;
+    }
+    result
 }
 
 #[derive(Debug)]
@@ -63,7 +81,7 @@ impl FieldElement {
     // Exponentiates a FieldElement value
     pub fn pow(&self, exponent: i64) -> Result<Self, String> {
         let n = modulo(exponent, self.prime - 1);
-        let num = modulo(self.num.pow(n as u32), self.prime);
+        let num = mod_pow(self.num, n, self.prime);
         FieldElement::new(num, self.prime)
     }
 
@@ -72,10 +90,9 @@ impl FieldElement {
         if self.prime != other.prime {
             return Err("Cannot divide two numbers in different Fields".to_string());
         }
-    // Calculate other's multiplicative inverse using Fermat's Little Theorem
-    let inv = modulo(other.num.pow((self.prime - 2) as u32), self.prime);
-    // Perform the division
-    let num = modulo(self.num * inv, self.prime);
+        // Calculate other's multiplicative inverse using Fermat's Little Theorem
+        let inv = mod_pow(other.num, self.prime - 2, self.prime);
+        let num = modulo(self.num * inv, self.prime);
         FieldElement::new(num, self.prime)
     }
 }
@@ -134,15 +151,13 @@ mod tests {
 
     #[test]
     fn test_div() {
-        let a = FieldElement::new(24, 31).unwrap();
-        let b = FieldElement::new(3, 31).unwrap();
-        assert_eq!(a.div(&b).unwrap(), FieldElement::new(0, 31).unwrap());
-        /*
-         a = FieldElement(17, 31)
-         self.assertEqual(a**-3, FieldElement(29, 31))
-         a = FieldElement(4, 31)
-         b = FieldElement(11, 31)
-         self.assertEqual(a**-4 * b, FieldElement(13, 31))
-        */
+        let a = FieldElement::new(3, 31).unwrap();
+        let b = FieldElement::new(24, 31).unwrap();
+        assert_eq!(a.div(&b).unwrap(), FieldElement::new(4, 31).unwrap());
+        let a = FieldElement::new(17, 31).unwrap();
+        assert_eq!(a.pow(-3), FieldElement::new(29, 31));
+        let a = FieldElement::new(4, 31).unwrap();
+        let b = FieldElement::new(11, 31).unwrap();
+        assert_eq!(a.pow(-4).unwrap().mul(&b), FieldElement::new(13, 31));
     }
 }
