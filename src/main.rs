@@ -1,6 +1,8 @@
 mod field_element;
+mod point;
 
 use field_element::FieldElement;
+use point::Point;
 
 fn main() {
     let a = FieldElement::new(15, 31).unwrap();
@@ -10,4 +12,10 @@ fn main() {
     println!("{}", a.mul(&b).unwrap());
     println!("{}", a.pow(4).unwrap());
     println!("{}", a.div(&b).unwrap());
+
+    let p1 = Point::new(Some(2), Some(5), 5, 7).unwrap();
+    let p2 = Point::new(Some(2), Some(-5), 5, 7).unwrap();
+    println!("{}", p1);
+    println!("{}", p2);
+    println!("{}", p1.add(&p2).unwrap());
 }
