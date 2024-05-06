@@ -15,7 +15,10 @@ fn main() {
 
     let p1 = Point::new(Some(2), Some(5), 5, 7).unwrap();
     let p2 = Point::new(Some(2), Some(-5), 5, 7).unwrap();
+    let p3 = Point::new(Some(3), Some(7), 5, 7).unwrap();
     println!("{}", p1);
     println!("{}", p2);
+    println!("{}", p3);
     println!("{}", p1.add(&p2).unwrap());
+    println!("{}", p2.add(&p3).unwrap());
 }
