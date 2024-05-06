@@ -1,7 +1,15 @@
+use std::fmt;
+
 #[derive(Debug)]
 pub struct FieldElement {
     num: i64,
     prime: i64,
+}
+
+impl fmt::Display for FieldElement {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "FieldElement({} in F_{})", self.num, self.prime)
+    }
 }
 
 impl FieldElement {
