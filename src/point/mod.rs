@@ -93,7 +93,28 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_point_equality() {
+    fn test_new() {
+        let a = Point::new(Some(2), Some(5), 5, 7);
+        assert!(a.is_ok());
+        let a = a.unwrap();
+        assert_eq!(a.x, Some(2));
+        assert_eq!(a.y, Some(5));
+        assert_eq!(a.a, 5);
+        assert_eq!(a.b, 7);
+        let a = Point::new(Some(2), Some(4), 5, 7);
+        assert!(a.is_err());
+    }
+
+    #[test]
+    fn test_display() {
+        let a = Point::new(Some(2), Some(5), 5, 7).unwrap();
+        assert_eq!(format!("{}", a), "Point(2,5)_5_7");
+        let b = Point::new(None, None, 5, 7).unwrap();
+        assert_eq!(format!("{}", b), "Point(infinity)");
+    }
+
+    #[test]
+    fn test_eq() {
         let a = Point::new(Some(3), Some(-7), 5, 7).unwrap();
         let b = Point::new(Some(18), Some(77), 5, 7).unwrap();
         assert_ne!(a, b);
@@ -101,7 +122,7 @@ mod tests {
     }
 
     #[test]
-    fn test_point_addition() {
+    fn test_add() {
         let inf = Point::new(None, None, 5, 7).unwrap();
         let p1 = Point::new(Some(2), Some(5), 5, 7).unwrap();
         let p2 = Point::new(Some(2), Some(-5), 5, 7).unwrap();
