@@ -1,4 +1,4 @@
-use std::{fmt, ops::Add};
+use std::{fmt, ops};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Point {
@@ -24,7 +24,7 @@ impl PartialEq for Point {
 }
 
 // Point addition
-impl Add for Point {
+impl ops::Add for Point {
     type Output = Self;
 
     fn add(self, other: Self) -> Self {

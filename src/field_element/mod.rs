@@ -1,7 +1,4 @@
-use std::{
-    fmt,
-    ops::{Add, Div, Mul, Sub},
-};
+use std::{fmt, ops};
 
 #[derive(Debug, Copy, Clone)]
 pub struct FieldElement {
@@ -23,7 +20,7 @@ impl PartialEq for FieldElement {
 }
 
 // Adds two FieldElement values
-impl Add for FieldElement {
+impl ops::Add for FieldElement {
     type Output = Self;
 
     fn add(self, other: Self) -> Self {
@@ -36,7 +33,7 @@ impl Add for FieldElement {
 }
 
 // Subtracts two FieldElement values
-impl Sub for FieldElement {
+impl ops::Sub for FieldElement {
     type Output = Self;
 
     fn sub(self, other: Self) -> Self {
@@ -49,7 +46,7 @@ impl Sub for FieldElement {
 }
 
 // Multiplies two FieldElement values
-impl Mul for FieldElement {
+impl ops::Mul for FieldElement {
     type Output = Self;
 
     fn mul(self, other: Self) -> Self {
@@ -62,7 +59,7 @@ impl Mul for FieldElement {
 }
 
 // Divides one FieldElement by another using Fermat's Little Theorem
-impl Div for FieldElement {
+impl ops::Div for FieldElement {
     type Output = Self;
 
     fn div(self, other: Self) -> Self {
