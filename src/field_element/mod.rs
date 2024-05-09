@@ -19,8 +19,6 @@ impl PartialEq for FieldElement {
   }
 }
 
-impl Eq for FieldElement {}
-
 impl FieldElement {
     // Getter for num
     pub fn get_num(&self) -> i64 {
@@ -117,6 +115,30 @@ impl FieldElement {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_new() {
+        let a = FieldElement::new(2, 31);
+        assert!(a.is_ok());
+        let a = a.unwrap();
+        assert_eq!(a.num, 2);
+        assert_eq!(a.prime, 31);
+        assert_eq!(a.get_num(), 2);
+        assert_eq!(a.get_prime(), 31);
+        let a = FieldElement::new(32, 31);
+        assert!(a.is_err());
+    }
+
+    #[test]
+    fn test_eq() {
+        let a = FieldElement::new(2, 31).unwrap();
+        let b = FieldElement::new(2, 31).unwrap();
+        let c = FieldElement::new(15, 31).unwrap();
+        assert_eq!(a, b);
+        assert_ne!(a, c);
+        assert!(a == b);
+        assert!(a != c);
+    }
 
     #[test]
     fn test_add() {
