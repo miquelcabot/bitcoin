@@ -1,6 +1,9 @@
-use std::fmt;
+use std::{
+    fmt,
+    ops::{Add, Div, Mul, Sub},
+};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct FieldElement {
     num: i64,
     prime: i64,
@@ -19,6 +22,60 @@ impl PartialEq for FieldElement {
     }
 }
 
+// Adds two FieldElement values
+impl Add for FieldElement {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self {
+        if self.prime != other.prime {
+            panic!("Cannot operate with two numbers in different Fields");
+        }
+        let num = Self::modulo(self.num + other.num, self.prime);
+        FieldElement::new(num, self.prime)
+    }
+}
+
+// Subtracts two FieldElement values
+impl Sub for FieldElement {
+    type Output = Self;
+
+    fn sub(self, other: Self) -> Self {
+        if self.prime != other.prime {
+            panic!("Cannot operate with two numbers in different Fields");
+        }
+        let num = Self::modulo(self.num - other.num + self.prime, self.prime); // Ensuring positive result
+        FieldElement::new(num, self.prime)
+    }
+}
+
+// Multiplies two FieldElement values
+impl Mul for FieldElement {
+    type Output = Self;
+
+    fn mul(self, other: Self) -> Self {
+        if self.prime != other.prime {
+            panic!("Cannot operate with two numbers in different Fields");
+        }
+        let num = Self::modulo(self.num * other.num, self.prime);
+        FieldElement::new(num, self.prime)
+    }
+}
+
+// Divides one FieldElement by another using Fermat's Little Theorem
+impl Div for FieldElement {
+    type Output = Self;
+
+    fn div(self, other: Self) -> Self {
+        if self.prime != other.prime {
+            panic!("Cannot operate with two numbers in different Fields");
+        }
+        // Calculate other's multiplicative inverse using Fermat's Little Theorem
+        let inv = Self::mod_pow(other.num, self.prime - 2, self.prime);
+        let num = Self::modulo(self.num * inv, self.prime);
+        FieldElement::new(num, self.prime)
+    }
+}
+
 impl FieldElement {
     // Getter for num
     pub fn get_num(&self) -> i64 {
@@ -31,56 +88,17 @@ impl FieldElement {
     }
 
     // Constructs a new FieldElement, ensuring the value is within the field range
-    pub fn new(num: i64, prime: i64) -> Result<Self, String> {
+    pub fn new(num: i64, prime: i64) -> Self {
         if num >= prime || num < 0 {
-            let error = format!("Num {} not in field range 0 to {}", num, prime - 1);
-            return Err(error);
+            panic!("Num {} not in field range 0 to {}", num, prime - 1);
         }
-        Ok(Self { num, prime })
-    }
-
-    // Adds two FieldElement values
-    pub fn add(&self, other: &FieldElement) -> Result<Self, String> {
-        if self.prime != other.prime {
-            return Err("Cannot add two numbers in different Fields".to_string());
-        }
-        let num = Self::modulo(self.num + other.num, self.prime);
-        FieldElement::new(num, self.prime)
-    }
-
-    // Subtracts two FieldElement values
-    pub fn sub(&self, other: &FieldElement) -> Result<Self, String> {
-        if self.prime != other.prime {
-            return Err("Cannot subtract two numbers in different Fields".to_string());
-        }
-        let num = Self::modulo(self.num - other.num + self.prime, self.prime); // Ensuring positive result
-        FieldElement::new(num, self.prime)
-    }
-
-    // Multiplies two FieldElement values
-    pub fn mul(&self, other: &FieldElement) -> Result<Self, String> {
-        if self.prime != other.prime {
-            return Err("Cannot multiply two numbers in different Fields".to_string());
-        }
-        let num = Self::modulo(self.num * other.num, self.prime);
-        FieldElement::new(num, self.prime)
+        Self { num, prime }
     }
 
     // Exponentiates a FieldElement value
-    pub fn pow(&self, exponent: i64) -> Result<Self, String> {
+    pub fn pow(&self, exponent: i64) -> Self {
         let n = Self::modulo(exponent, self.prime - 1);
         let num = Self::mod_pow(self.num, n, self.prime);
-        FieldElement::new(num, self.prime)
-    }
-
-    // Divides one FieldElement by another using Fermat's Little Theorem
-    pub fn div(&self, other: &FieldElement) -> Result<Self, String> {
-        if self.prime != other.prime {
-            return Err("Cannot divide two numbers in different Fields".to_string());
-        }
-        // Calculate other's multiplicative inverse using Fermat's Little Theorem
-        let inv = Self::mod_pow(other.num, self.prime - 2, self.prime);
-        let num = Self::modulo(self.num * inv, self.prime);
         FieldElement::new(num, self.prime)
     }
 
@@ -119,21 +137,23 @@ mod tests {
     #[test]
     fn test_new() {
         let a = FieldElement::new(2, 31);
-        assert!(a.is_ok());
-        let a = a.unwrap();
         assert_eq!(a.num, 2);
         assert_eq!(a.prime, 31);
         assert_eq!(a.get_num(), 2);
         assert_eq!(a.get_prime(), 31);
-        let a = FieldElement::new(32, 31);
-        assert!(a.is_err());
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_new_panic() {
+        FieldElement::new(32, 31);
     }
 
     #[test]
     fn test_eq() {
-        let a = FieldElement::new(2, 31).unwrap();
-        let b = FieldElement::new(2, 31).unwrap();
-        let c = FieldElement::new(15, 31).unwrap();
+        let a = FieldElement::new(2, 31);
+        let b = FieldElement::new(2, 31);
+        let c = FieldElement::new(15, 31);
         assert_eq!(a, b);
         assert_ne!(a, c);
         assert!(a == b);
@@ -142,52 +162,49 @@ mod tests {
 
     #[test]
     fn test_add() {
-        let a = FieldElement::new(2, 31).unwrap();
-        let b = FieldElement::new(15, 31).unwrap();
-        assert_eq!(a.add(&b).unwrap(), FieldElement::new(17, 31).unwrap());
-        let a = FieldElement::new(17, 31).unwrap();
-        let b = FieldElement::new(21, 31).unwrap();
-        assert_eq!(a.add(&b).unwrap(), FieldElement::new(7, 31).unwrap());
+        let a = FieldElement::new(2, 31);
+        let b = FieldElement::new(15, 31);
+        assert_eq!(a + b, FieldElement::new(17, 31));
+        let a = FieldElement::new(17, 31);
+        let b = FieldElement::new(21, 31);
+        assert_eq!(a + b, FieldElement::new(7, 31));
     }
 
     #[test]
     fn test_sub() {
-        let a = FieldElement::new(29, 31).unwrap();
-        let b = FieldElement::new(4, 31).unwrap();
-        assert_eq!(a.sub(&b).unwrap(), FieldElement::new(25, 31).unwrap());
-        let a = FieldElement::new(15, 31).unwrap();
-        let b = FieldElement::new(30, 31).unwrap();
-        assert_eq!(a.sub(&b).unwrap(), FieldElement::new(16, 31).unwrap());
+        let a = FieldElement::new(29, 31);
+        let b = FieldElement::new(4, 31);
+        assert_eq!(a - b, FieldElement::new(25, 31));
+        let a = FieldElement::new(15, 31);
+        let b = FieldElement::new(30, 31);
+        assert_eq!(a - b, FieldElement::new(16, 31));
     }
 
     #[test]
     fn test_mul() {
-        let a = FieldElement::new(24, 31).unwrap();
-        let b = FieldElement::new(19, 31).unwrap();
-        assert_eq!(a.mul(&b).unwrap(), FieldElement::new(22, 31).unwrap());
+        let a = FieldElement::new(24, 31);
+        let b = FieldElement::new(19, 31);
+        assert_eq!(a * b, FieldElement::new(22, 31));
     }
 
     #[test]
     fn test_pow() {
-        let a = FieldElement::new(17, 31).unwrap();
-        assert_eq!(a.pow(3).unwrap(), FieldElement::new(15, 31).unwrap());
-        let a = FieldElement::new(5, 31).unwrap();
-        let b = FieldElement::new(18, 31).unwrap();
-        assert_eq!(
-            a.pow(5).unwrap().mul(&b).unwrap(),
-            FieldElement::new(16, 31).unwrap()
-        );
+        let a = FieldElement::new(17, 31);
+        assert_eq!(a.pow(3), FieldElement::new(15, 31));
+        let a = FieldElement::new(5, 31);
+        let b = FieldElement::new(18, 31);
+        assert_eq!(a.pow(5) * b, FieldElement::new(16, 31));
     }
 
     #[test]
     fn test_div() {
-        let a = FieldElement::new(3, 31).unwrap();
-        let b = FieldElement::new(24, 31).unwrap();
-        assert_eq!(a.div(&b).unwrap(), FieldElement::new(4, 31).unwrap());
-        let a = FieldElement::new(17, 31).unwrap();
+        let a = FieldElement::new(3, 31);
+        let b = FieldElement::new(24, 31);
+        assert_eq!(a / b, FieldElement::new(4, 31));
+        let a = FieldElement::new(17, 31);
         assert_eq!(a.pow(-3), FieldElement::new(29, 31));
-        let a = FieldElement::new(4, 31).unwrap();
-        let b = FieldElement::new(11, 31).unwrap();
-        assert_eq!(a.pow(-4).unwrap().mul(&b), FieldElement::new(13, 31));
+        let a = FieldElement::new(4, 31);
+        let b = FieldElement::new(11, 31);
+        assert_eq!(a.pow(-4) * b, FieldElement::new(13, 31));
     }
 }
