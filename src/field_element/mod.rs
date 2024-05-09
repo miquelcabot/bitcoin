@@ -1,9 +1,9 @@
 use std::fmt;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FieldElement {
-    pub num: i64,
-    pub prime: i64,
+    num: i64,
+    prime: i64,
 }
 
 impl fmt::Display for FieldElement {
@@ -12,7 +12,26 @@ impl fmt::Display for FieldElement {
     }
 }
 
+// Equality is automatically derived and does not need to be manually implemented
+impl PartialEq for FieldElement {
+  fn eq(&self, other: &Self) -> bool {
+      self.num == other.num && self.prime == other.prime
+  }
+}
+
+impl Eq for FieldElement {}
+
 impl FieldElement {
+    // Getter for num
+    pub fn get_num(&self) -> i64 {
+      self.num
+    }
+
+    // Getter for prime
+    pub fn get_prime(&self) -> i64 {
+      self.prime
+    }
+
     // Constructs a new FieldElement, ensuring the value is within the field range
     pub fn new(num: i64, prime: i64) -> Result<Self, String> {
         if num >= prime || num < 0 {
@@ -94,15 +113,6 @@ impl FieldElement {
         result
     }
 }
-
-// Equality is automatically derived and does not need to be manually implemented
-impl PartialEq for FieldElement {
-    fn eq(&self, other: &Self) -> bool {
-        self.num == other.num && self.prime == other.prime
-    }
-}
-
-impl Eq for FieldElement {}
 
 #[cfg(test)]
 mod tests {

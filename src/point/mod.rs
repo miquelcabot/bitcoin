@@ -2,10 +2,10 @@ use std::fmt;
 
 #[derive(Debug, Clone)]
 pub struct Point {
-    pub x: Option<i64>,
-    pub y: Option<i64>,
-    pub a: i64,
-    pub b: i64,
+    x: Option<i64>,
+    y: Option<i64>,
+    a: i64,
+    b: i64,
 }
 
 impl fmt::Display for Point {
@@ -24,6 +24,22 @@ impl PartialEq for Point {
 }
 
 impl Point {
+    pub fn get_x(&self) -> Option<i64> {
+        self.x
+    }
+
+    pub fn get_y(&self) -> Option<i64> {
+        self.y
+    }
+
+    pub fn get_a(&self) -> i64 {
+        self.a
+    }
+
+    pub fn get_b(&self) -> i64 {
+        self.b
+    }
+
     // Constructs a new Point
     pub fn new(x: Option<i64>, y: Option<i64>, a: i64, b: i64) -> Result<Self, String> {
         match (x, y) {
