@@ -14,20 +14,20 @@ impl fmt::Display for FieldElement {
 
 // Equality is automatically derived and does not need to be manually implemented
 impl PartialEq for FieldElement {
-  fn eq(&self, other: &Self) -> bool {
-      self.num == other.num && self.prime == other.prime
-  }
+    fn eq(&self, other: &Self) -> bool {
+        self.num == other.num && self.prime == other.prime
+    }
 }
 
 impl FieldElement {
     // Getter for num
     pub fn get_num(&self) -> i64 {
-      self.num
+        self.num
     }
 
     // Getter for prime
     pub fn get_prime(&self) -> i64 {
-      self.prime
+        self.prime
     }
 
     // Constructs a new FieldElement, ensuring the value is within the field range
