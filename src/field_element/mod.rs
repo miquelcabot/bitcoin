@@ -2,8 +2,8 @@ use std::fmt;
 
 #[derive(Debug)]
 pub struct FieldElement {
-    num: i64,
-    prime: i64,
+    pub num: i64,
+    pub prime: i64,
 }
 
 impl fmt::Display for FieldElement {

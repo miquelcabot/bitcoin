@@ -2,10 +2,10 @@ use std::fmt;
 
 #[derive(Debug, Clone)]
 pub struct Point {
-    x: Option<i64>,
-    y: Option<i64>,
-    a: i64,
-    b: i64,
+    pub x: Option<i64>,
+    pub y: Option<i64>,
+    pub a: i64,
+    pub b: i64,
 }
 
 impl fmt::Display for Point {
