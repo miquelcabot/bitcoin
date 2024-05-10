@@ -33,6 +33,22 @@ impl PartialEq for FieldElementPoint {
 }
 
 impl FieldElementPoint {
+    pub fn get_x(&self) -> Option<FieldElement> {
+        self.x
+    }
+
+    pub fn get_y(&self) -> Option<FieldElement> {
+        self.y
+    }
+
+    pub fn get_a(&self) -> FieldElement {
+        self.a
+    }
+
+    pub fn get_b(&self) -> FieldElement {
+        self.b
+    }
+
     // Constructs a new FieldElementPoint
     pub fn new(
         x: Option<FieldElement>,
