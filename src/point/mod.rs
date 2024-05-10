@@ -15,7 +15,7 @@ impl fmt::Display for Point {
             None => write!(f, "Point(infinity)"),
             Some(x) => write!(
                 f,
-                "Point({},{})_{}_{} FieldElement({})",
+                "Point({},{})_{}_{} in F_{}",
                 x.get_num(),
                 self.y.unwrap().get_num(),
                 self.a.get_num(),
@@ -124,7 +124,7 @@ mod tests {
             let p = Point::new(Some(x), Some(y), a, b);
             assert_eq!(
                 format!(
-                    "Point({},{})_{}_{} FieldElement({})",
+                    "Point({},{})_{}_{} in F_{}",
                     p.x.unwrap().get_num(),
                     p.y.unwrap().get_num(),
                     p.a.get_num(),
@@ -157,7 +157,7 @@ mod tests {
             FieldElement::new(0, prime),
             FieldElement::new(7, prime),
         );
-        assert_eq!(format!("{}", a), "Point(192,105)_0_7 FieldElement(223)");
+        assert_eq!(format!("{}", a), "Point(192,105)_0_7 in F_223");
         let b = Point::new(
             None,
             None,
