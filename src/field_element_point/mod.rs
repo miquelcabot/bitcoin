@@ -50,10 +50,10 @@ impl ops::Add for FieldElementPoint {
                 }
                 // Handling the doubling case
                 if self == other {
-                    let num = FieldElement::new(3, x1.get_prime()) * x1.pow(2) + self.a;
-                    let denom = FieldElement::new(2, x1.get_prime()) * self.y.unwrap();
+                    let num = 3 * x1.pow(2) + self.a;
+                    let denom = 2 * self.y.unwrap();
                     let s = num / denom;
-                    let x3 = s.pow(2) - FieldElement::new(2, x1.get_prime()) * x1;
+                    let x3 = s.pow(2) - 2 * x1;
                     let y3 = s * (x1 - x3) - self.y.unwrap();
                     return FieldElementPoint::new(Some(x3), Some(y3), self.a, self.b);
                 }

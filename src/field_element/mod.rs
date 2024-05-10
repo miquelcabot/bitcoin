@@ -46,7 +46,7 @@ impl ops::Sub for FieldElement {
 }
 
 // Multiplies two FieldElement values
-impl ops::Mul for FieldElement {
+impl ops::Mul<Self> for FieldElement {
     type Output = Self;
 
     fn mul(self, other: Self) -> Self {
@@ -55,6 +55,25 @@ impl ops::Mul for FieldElement {
         }
         let num = Self::modulo(self.num * other.num, self.prime);
         FieldElement::new(num, self.prime)
+    }
+}
+
+// Multiplies a FieldElement by a scalar
+impl ops::Mul<i32> for FieldElement {
+    type Output = Self;
+
+    fn mul(self, other: i32) -> Self {
+        let num = Self::modulo(self.num * (other as i64), self.prime);
+        FieldElement::new(num, self.prime)
+    }
+}
+
+impl ops::Mul<FieldElement> for i32 {
+    type Output = FieldElement;
+
+    fn mul(self, other: FieldElement) -> FieldElement {
+        let num = FieldElement::modulo((self as i64) * other.num, other.prime);
+        FieldElement::new(num, other.prime)
     }
 }
 
