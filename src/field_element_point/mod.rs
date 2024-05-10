@@ -186,4 +186,71 @@ mod tests {
         );
         assert_eq!(p1, p2);
     }
+
+    #[test]
+    fn test_add() {
+        let prime = 223;
+        let a = FieldElement::new(0, prime);
+        let b = FieldElement::new(7, prime);
+
+        let additions = vec![
+            (192, 105, 17, 56, 170, 142),
+            (47, 71, 117, 141, 60, 139),
+            (143, 98, 76, 66, 47, 71),
+        ];
+
+        for (x1_raw, y1_raw, x2_raw, y2_raw, x3_raw, y3_raw) in additions {
+            let x1 = FieldElement::new(x1_raw, prime);
+            let y1 = FieldElement::new(y1_raw, prime);
+            let p1 = FieldElementPoint::new(Some(x1), Some(y1), a, b);
+
+            let x2 = FieldElement::new(x2_raw, prime);
+            let y2 = FieldElement::new(y2_raw, prime);
+            let p2 = FieldElementPoint::new(Some(x2), Some(y2), a, b);
+
+            let x3 = FieldElement::new(x3_raw, prime);
+            let y3 = FieldElement::new(y3_raw, prime);
+            let p3 = FieldElementPoint::new(Some(x3), Some(y3), a, b);
+
+            assert_eq!(p1 + p2, p3);
+        }
+    }
+
+    #[test]
+    fn test_rmul() {
+        let prime = 223;
+        let a = FieldElement::new(0, prime);
+        let b = FieldElement::new(7, prime);
+
+        let multiplications = vec![
+            (2, 192, 105, Some(49), Some(71)),
+            (2, 143, 98, Some(64), Some(168)),
+            (2, 47, 71, Some(36), Some(111)),
+            (4, 47, 71, Some(194), Some(51)),
+            (8, 47, 71, Some(116), Some(55)),
+            (21, 47, 71, None, None),
+        ];
+
+        for (s, x1_raw, y1_raw, x2_raw, y2_raw) in multiplications {
+            let x1 = FieldElement::new(x1_raw, prime);
+            let y1 = FieldElement::new(y1_raw, prime);
+            let p1 = FieldElementPoint::new(Some(x1), Some(y1), a, b);
+
+            let p2 = match (x2_raw, y2_raw) {
+                (Some(x2), Some(y2)) => {
+                    let x2 = FieldElement::new(x2, prime);
+                    let y2 = FieldElement::new(y2, prime);
+                    FieldElementPoint::new(Some(x2), Some(y2), a, b)
+                }
+                _ => FieldElementPoint::new(None, None, a, b),
+            };
+
+            let mut result = p1.clone();
+            for _ in 1..s {
+                result = result + p1;
+            }
+
+            assert_eq!(result, p2);
+        }
+    }
 }
