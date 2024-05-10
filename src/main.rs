@@ -7,6 +7,7 @@ use field_element_point::FieldElementPoint;
 use point::Point;
 
 fn main() {
+    // FieldElement
     let a = FieldElement::new(15, 31);
     let b = FieldElement::new(5, 31);
     println!("{}", a);
@@ -18,6 +19,7 @@ fn main() {
     println!("{}", a.pow(4));
     println!("{}", a / b);
 
+    // Point
     let p1 = Point::new(Some(2), Some(5), 5, 7);
     let p2 = Point::new(Some(2), Some(-5), 5, 7);
     let p3 = Point::new(Some(3), Some(7), 5, 7);
@@ -27,6 +29,7 @@ fn main() {
     println!("{}", p1 + p2);
     println!("{}", p2 + p3);
 
+    // FieldElementPoint
     let prime = 223;
     let a = FieldElement::new(0, prime);
     let b = FieldElement::new(7, prime);
