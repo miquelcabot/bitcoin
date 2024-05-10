@@ -26,6 +26,12 @@ impl fmt::Display for FieldElementPoint {
     }
 }
 
+impl PartialEq for FieldElementPoint {
+    fn eq(&self, other: &Self) -> bool {
+        self.x == other.x && self.y == other.y && self.a == other.a && self.b == other.b
+    }
+}
+
 impl FieldElementPoint {
     // Constructs a new FieldElementPoint
     pub fn new(
@@ -61,10 +67,6 @@ mod tests {
             (FieldElement::new(17, prime), FieldElement::new(56, prime)),
             (FieldElement::new(1, prime), FieldElement::new(193, prime)),
         ];
-        let invalid_points = vec![
-            (FieldElement::new(200, prime), FieldElement::new(119, prime)),
-            (FieldElement::new(42, prime), FieldElement::new(99, prime)),
-        ];
         for (x, y) in valid_points {
             let p = FieldElementPoint::new(Some(x), Some(y), a, b);
             assert_eq!(
@@ -79,5 +81,56 @@ mod tests {
                 p.to_string()
             );
         }
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_new_panic() {
+        let prime = 223;
+        FieldElementPoint::new(
+            Some(FieldElement::new(200, prime)),
+            Some(FieldElement::new(119, prime)),
+            FieldElement::new(0, prime),
+            FieldElement::new(7, prime),
+        );
+    }
+
+    #[test]
+    fn test_display() {
+        let prime = 223;
+        let a = FieldElementPoint::new(
+            Some(FieldElement::new(192, prime)),
+            Some(FieldElement::new(105, prime)),
+            FieldElement::new(0, prime),
+            FieldElement::new(7, prime),
+        );
+        assert_eq!(format!("{}", a), "FieldElementPoint(192,105)_0_7 in F_223");
+        let b = FieldElementPoint::new(
+            None,
+            None,
+            FieldElement::new(0, prime),
+            FieldElement::new(7, prime),
+        );
+        assert_eq!(format!("{}", b), "FieldElementPoint(infinity)");
+    }
+
+    #[test]
+    fn test_eq() {
+        let prime = 223;
+        let a = FieldElement::new(0, prime);
+        let b = FieldElement::new(7, prime);
+        let p1 = FieldElementPoint::new(
+            Some(FieldElement::new(192, prime)),
+            Some(FieldElement::new(105, prime)),
+            a,
+            b,
+        );
+        let p2 = FieldElementPoint::new(
+            Some(FieldElement::new(192, prime)),
+            Some(FieldElement::new(105, prime)),
+            a,
+            b,
+        );
+        assert_eq!(p1, p2);
     }
 }
