@@ -204,6 +204,12 @@ mod tests {
     }
 
     #[test]
+    fn test_scalarmul() {
+        let a = FieldElement::new(24, 31);
+        assert_eq!(2 * a, a + a);
+    }
+
+    #[test]
     fn test_pow() {
         let a = FieldElement::new(17, 31);
         assert_eq!(a.pow(3), FieldElement::new(15, 31));
