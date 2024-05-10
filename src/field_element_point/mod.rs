@@ -32,6 +32,43 @@ impl PartialEq for FieldElementPoint {
     }
 }
 
+// Point addition
+impl ops::Add for FieldElementPoint {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self {
+        if self.a != other.a || self.b != other.b {
+            panic!("Points are not on the same curve");
+        }
+
+        match (self.x, other.x) {
+            (None, _) => return other.clone(),
+            (_, None) => return self.clone(),
+            (Some(x1), Some(x2)) if x1 == x2 => {
+                if self.y != other.y {
+                    return FieldElementPoint::new(None, None, self.a, self.b); // Point at infinity
+                }
+                // Handling the doubling case
+                if self == other {
+                    let num = FieldElement::new(3, x1.get_prime()) * x1.pow(2) + self.a;
+                    let denom = FieldElement::new(2, x1.get_prime()) * self.y.unwrap();
+                    let s = num / denom;
+                    let x3 = s.pow(2) - FieldElement::new(2, x1.get_prime()) * x1;
+                    let y3 = s * (x1 - x3) - self.y.unwrap();
+                    return FieldElementPoint::new(Some(x3), Some(y3), self.a, self.b);
+                }
+            }
+            (Some(x1), Some(x2)) => {
+                let s = (other.y.unwrap() - self.y.unwrap()) / (x2 - x1);
+                let x3 = s.pow(2) - x1 - x2;
+                let y3 = s * (x1 - x3) - self.y.unwrap();
+                return FieldElementPoint::new(Some(x3), Some(y3), self.a, self.b);
+            }
+        }
+        panic!("Unhandled point addition case");
+    }
+}
+
 impl FieldElementPoint {
     pub fn get_x(&self) -> Option<FieldElement> {
         self.x
