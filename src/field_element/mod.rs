@@ -72,8 +72,7 @@ impl ops::Mul<FieldElement> for i32 {
     type Output = FieldElement;
 
     fn mul(self, other: FieldElement) -> FieldElement {
-        let num = FieldElement::modulo((self as i64) * other.num, other.prime);
-        FieldElement::new(num, other.prime)
+        other * self
     }
 }
 

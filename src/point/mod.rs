@@ -69,6 +69,32 @@ impl ops::Add for Point {
     }
 }
 
+impl ops::Mul<i32> for Point {
+    type Output = Self;
+
+    fn mul(self, other: i32) -> Self {
+        let mut coef = other;
+        let mut current = self;
+        let mut result = Point::new(None, None, self.a, self.b);
+        while coef > 0 {
+            if coef & 1 == 1 {
+                result = result + current;
+            }
+            current = current + current;
+            coef >>= 1;
+        }
+        result
+    }
+}
+
+impl ops::Mul<Point> for i32 {
+    type Output = Point;
+
+    fn mul(self, other: Point) -> Point {
+        other * self
+    }
+}
+
 impl Point {
     pub fn get_x(&self) -> Option<FieldElement> {
         self.x
