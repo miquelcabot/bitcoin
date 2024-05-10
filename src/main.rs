@@ -48,4 +48,21 @@ fn main() {
     println!("{}", x);
     println!("{}", y);
     println!("{}", x + y);
+
+    // FieldElementPoint multiplication
+    /* let x = FieldElementPoint::new(
+        Some(FieldElement::new(47, prime)),
+        Some(FieldElement::new(71, prime)),
+        a,
+        b,
+    );
+    for s in 1..21 {
+        let result = x * s;
+        println!(
+            "{}*(47,71)=({},{})",
+            s,
+            result.get_x().unwrap(),
+            result.get_y().unwrap()
+        );
+    } */
 }
