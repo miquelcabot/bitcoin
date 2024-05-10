@@ -45,20 +45,14 @@ fn main() {
         x.get_b()
     );
 
-    // Point multiplication
-    /* let x = Point::new(
-        Some(FieldElement::new(47, prime)),
-        Some(FieldElement::new(71, prime)),
+    let z = Point::new(
+        Some(FieldElement::new(15, prime)),
+        Some(FieldElement::new(86, prime)),
         a,
         b,
     );
-    for s in 1..21 {
-        let result = x * s;
-        println!(
-            "{}*(47,71)=({},{})",
-            s,
-            result.get_x().unwrap(),
-            result.get_y().unwrap()
-        );
-    } */
+    println!("{}", z * 6);
+    println!("{}", 6 * z);
+    println!("{}", z * 7);
+    println!("{}", 7 * z);
 }

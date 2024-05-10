@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "bitcoin"
+name = "field_element_point"
 version = "0.1.0"
