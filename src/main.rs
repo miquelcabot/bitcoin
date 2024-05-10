@@ -37,6 +37,14 @@ fn main() {
     println!("{}", y);
     println!("{}", x + y);
 
+    println!(
+        "{}, {}, {}, {}",
+        x.get_x().unwrap(),
+        x.get_y().unwrap(),
+        x.get_a(),
+        x.get_b()
+    );
+
     // Point multiplication
     /* let x = Point::new(
         Some(FieldElement::new(47, prime)),
