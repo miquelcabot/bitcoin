@@ -1,9 +1,9 @@
 mod field_element;
-// mod field_element_point;
+mod field_element_point;
 mod point;
 
 use field_element::FieldElement;
-//use field_element_point::FieldElementPoint;
+use field_element_point::FieldElementPoint;
 use point::Point;
 
 fn main() {
@@ -26,41 +26,27 @@ fn main() {
     println!("{}", p3);
     println!("{}", p1 + p2);
     println!("{}", p2 + p3);
-    /*
+
     let prime = 223;
-    let a = FieldElement::new(0, prime).unwrap();
-    let b = FieldElement::new(7, prime).unwrap();
+    let a = FieldElement::new(0, prime);
+    let b = FieldElement::new(7, prime);
     let valid_points = vec![
-        (
-            FieldElement::new(192, prime).unwrap(),
-            FieldElement::new(105, prime).unwrap(),
-        ),
-        (
-            FieldElement::new(17, prime).unwrap(),
-            FieldElement::new(56, prime).unwrap(),
-        ),
-        (
-            FieldElement::new(1, prime).unwrap(),
-            FieldElement::new(193, prime).unwrap(),
-        ),
+        (FieldElement::new(192, prime), FieldElement::new(105, prime)),
+        (FieldElement::new(17, prime), FieldElement::new(56, prime)),
+        (FieldElement::new(1, prime), FieldElement::new(193, prime)),
     ];
     let invalid_points = vec![
-        (
-            FieldElement::new(200, prime).unwrap(),
-            FieldElement::new(119, prime).unwrap(),
-        ),
-        (
-            FieldElement::new(42, prime).unwrap(),
-            FieldElement::new(99, prime).unwrap(),
-        ),
+        (FieldElement::new(200, prime), FieldElement::new(119, prime)),
+        (FieldElement::new(42, prime), FieldElement::new(99, prime)),
     ];
     let a = FieldElementPoint::new(
-        Some(FieldElement::new(192, prime).unwrap()),
-        Some(FieldElement::new(105, prime).unwrap()),
-        a.clone(),
-        b.clone(),
+        Some(FieldElement::new(192, prime)),
+        Some(FieldElement::new(105, prime)),
+        a,
+        b,
     );
-
+    println!("{}", a);
+    /*
     println!("{:?}", a);
 
     let p4 = FieldElementPoint::new(Some(2), Some(5), 5, 7, 31).unwrap();
