@@ -139,7 +139,7 @@ impl FieldElement {
             if exponent % 2 == 1 {
                 result = result * base % z;
             }
-            exponent = exponent >> 1;
+            exponent >>= 1;
             base = base * base % z;
         }
         result

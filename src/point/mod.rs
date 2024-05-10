@@ -42,8 +42,8 @@ impl ops::Add for Point {
         }
 
         match (self.x, other.x) {
-            (None, _) => return other.clone(),
-            (_, None) => return self.clone(),
+            (None, _) => return other,
+            (_, None) => return self,
             (Some(x1), Some(x2)) if x1 == x2 => {
                 if self.y != other.y {
                     return Point::new(None, None, self.a, self.b); // Point at infinity
