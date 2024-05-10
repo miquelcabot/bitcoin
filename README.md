@@ -16,12 +16,19 @@ field_element_point = "0.1.0"
 ## Usage
 
 ```rust
-use field_element_point::FieldElementPoint;
+use field_element::FieldElement;
 
 fn main() {
-    let p = FieldElementPoint::new(2, 3, 5, 7, 13);
-    let q = FieldElementPoint::new(2, 3, 5, 7, 13);
-    let r = p + q;
-    println!("{:?}", r);
+    let a = FieldElement::new(5, 7);
+    let b = FieldElement::new(3, 7);
+    let c = FieldElement::new(1, 7);
+    let d = FieldElement::new(1, 7);
+
+    let p1 = FieldElementPoint::new(a, b, c, d);
+    let p2 = FieldElementPoint::new(a, b, c, d);
+
+    let p3 = p1 + p2;
+    let p4 = p1 * 2;
+    let p5 = -p1;
 }
 ```
