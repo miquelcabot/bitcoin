@@ -1,8 +1,8 @@
 mod field_element;
-mod point;
+//mod point;
 
 use field_element::FieldElement;
-use point::Point;
+//use point::Point;
 
 fn main() {
     // FieldElement
@@ -14,7 +14,7 @@ fn main() {
     println!("{}", a + b);
     println!("{}", a - b);
     println!("{}", a * b);
-    println!("{}", a.pow(4));
+/*     println!("{}", a.pow(4));
     println!("{}", a / b);
 
     // Point
@@ -54,5 +54,5 @@ fn main() {
     println!("{}", z * 6);
     println!("{}", 6 * z);
     println!("{}", z * 7);
-    println!("{}", 7 * z);
+    println!("{}", 7 * z);*/
 }

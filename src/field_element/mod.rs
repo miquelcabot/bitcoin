@@ -144,7 +144,7 @@ impl FieldElement {
 
     fn abs(a: U256) -> U256 {
         if a < U256::from(0) {
-          a.overflowing_neg().0
+            a.overflowing_neg().0
         } else {
             a
         }
