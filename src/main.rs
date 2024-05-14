@@ -7,8 +7,8 @@ use point::Point;
 fn main() {
     // FieldElement
     let prime = "0xf70f0ce418c335ec6faadba16b3dc01273ac8260966d4cb8bb15d4f33b8aa055";
-    let x = "0xb50f0ce418c335ec6faadba16b3dc01273ac8260966d4cb8bb15d4f33b8aa055";
-    let y = "0xa30f0ce418c335ec6faadba16b3dc01273ac8260966d4cb8bb15d4f33b8aa055";
+    let x = "0x5a3028a13c7c5b0b455c155198de1a4b3a75a9009b972cd17577c0bd6a3a0949";
+    let y = "0x923051f0a7a42d04bd25d1d4f65b4e51a365d8df764ea0ad02f8f576008dec00";
 
     let a = FieldElement::new(x, prime);
     let b = FieldElement::new(y, prime);
@@ -23,18 +23,18 @@ fn main() {
     println!("{}", a / b);
 
     // Point
-    let prime = 223;
-    let a = FieldElement::new(0, prime);
-    let b = FieldElement::new(7, prime);
+    // let prime = 223;
+    let a = FieldElement::new("0", prime);
+    let b = FieldElement::new("7", prime);
     let x = Point::new(
-        Some(FieldElement::new(192, prime)),
-        Some(FieldElement::new(105, prime)),
+        Some(FieldElement::new("192", prime)),
+        Some(FieldElement::new("105", prime)),
         a,
         b,
     );
     let y = Point::new(
-        Some(FieldElement::new(17, prime)),
-        Some(FieldElement::new(56, prime)),
+        Some(FieldElement::new("17", prime)),
+        Some(FieldElement::new("56", prime)),
         a,
         b,
     );
@@ -51,8 +51,8 @@ fn main() {
     );
 
     let z = Point::new(
-        Some(FieldElement::new(15, prime)),
-        Some(FieldElement::new(86, prime)),
+        Some(FieldElement::new("15", prime)),
+        Some(FieldElement::new("86", prime)),
         a,
         b,
     );
