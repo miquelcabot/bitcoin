@@ -43,100 +43,8 @@ impl FieldElement {
 
     // Exponentiates a FieldElement value
     pub fn pow(&self, exponent: U256) -> Self {
-        let number = Self::modular_pow(self.number, exponent, self.prime);
+        let number = modular_pow(self.number, exponent, self.prime);
         FieldElement::new(number, self.prime)
-    }
-
-    // Modular addition
-    fn modular_add(a: U256, b: U256, modulus: U256) -> U256 {
-        let (result, overflow) = a.overflowing_add(b);
-        if overflow || result >= modulus {
-            result.overflowing_sub(modulus).0
-        } else {
-            result
-        }
-    }
-
-    // Modular subtraction
-    fn modular_sub(a: U256, b: U256, modulus: U256) -> U256 {
-        if a >= b {
-            a - b
-        } else {
-            let (result, _) = modulus.overflowing_sub(b - a);
-            result
-        }
-    }
-
-    // Modular multiplication
-    fn modular_mul(a: U256, b: U256, modulus: U256) -> U256 {
-        let mut result = U256::zero();
-        let mut temp_a = a;
-        let mut temp_b = b;
-
-        while !temp_b.is_zero() {
-            if temp_b.low_u64() & 1 == 1 {
-                let (new_result, overflow) = result.overflowing_add(temp_a);
-                result = if overflow || new_result >= modulus {
-                    new_result.overflowing_sub(modulus).0
-                } else {
-                    new_result
-                };
-            }
-            temp_a = temp_a.overflowing_add(temp_a).0;
-            if temp_a >= modulus {
-                temp_a = temp_a.overflowing_sub(modulus).0;
-            }
-            temp_b = temp_b >> 1;
-        }
-
-        result
-    }
-
-    // Modular inverse using the Extended Euclidean Algorithm
-    fn modular_inverse(a: U256, modulus: U256) -> Option<U256> {
-        let mut t = U256::zero();
-        let mut new_t = U256::one();
-        let mut r = modulus;
-        let mut new_r = a;
-
-        while !new_r.is_zero() {
-            let quotient = r / new_r;
-
-            let temp_t = t;
-            t = new_t;
-            new_t = Self::modular_sub(temp_t, Self::modular_mul(quotient, new_t, modulus), modulus);
-
-            let temp_r = r;
-            r = new_r;
-            new_r = temp_r - quotient * new_r;
-        }
-
-        if r > U256::one() {
-            return None; // No inverse exists
-        }
-
-        if t < U256::zero() {
-            t = t + modulus;
-        }
-
-        Some(t)
-    }
-
-    // Modular exponentiation
-    fn modular_pow(base: U256, exponent: U256, modulus: U256) -> U256 {
-        let mut result = U256::one();
-        let mut base = base % modulus;
-        let mut exponent = exponent;
-
-        while !exponent.is_zero() {
-            if exponent.low_u64() & 1 == 1 {
-                result = Self::modular_mul(result, base, modulus);
-            }
-            exponent = exponent >> 1;
-            base = Self::modular_mul(base, base, modulus);
-        }
-
-        result
     }
 }
 
@@ -161,7 +69,7 @@ impl ops::Add for FieldElement {
         if self.prime != other.prime {
             panic!("Cannot operate with two numbers in different Fields");
         }
-        let number = Self::modular_add(self.number, other.number, self.prime);
+        let number = modular_add(self.number, other.number, self.prime);
         FieldElement::new(number, self.prime)
     }
 }
@@ -174,7 +82,7 @@ impl ops::Sub for FieldElement {
         if self.prime != other.prime {
             panic!("Cannot operate with two numbers in different Fields");
         }
-        let number = Self::modular_sub(self.number, other.number, self.prime);
+        let number = modular_sub(self.number, other.number, self.prime);
         FieldElement::new(number, self.prime)
     }
 }
@@ -187,7 +95,7 @@ impl ops::Mul<Self> for FieldElement {
         if self.prime != other.prime {
             panic!("Cannot operate with two numbers in different Fields");
         }
-        let number = Self::modular_mul(self.number, other.number, self.prime);
+        let number = modular_mul(self.number, other.number, self.prime);
         FieldElement::new(number, self.prime)
     }
 }
@@ -197,7 +105,7 @@ impl ops::Mul<i32> for FieldElement {
     type Output = Self;
 
     fn mul(self, other: i32) -> Self {
-        let number = Self::modular_mul(self.number, U256::from(other), self.prime);
+        let number = modular_mul(self.number, U256::from(other), self.prime);
         FieldElement::new(number, self.prime)
     }
 }
@@ -220,13 +128,105 @@ impl ops::Div for FieldElement {
             panic!("Cannot operate with two numbers in different Fields");
         }
         // Calculate other's multiplicative inverse using Fermat's Little Theorem
-        if let Some(inv) = Self::modular_inverse(other.number, self.prime) {
-            let number = Self::modular_mul(self.number, inv, self.prime);
+        if let Some(inv) = modular_inverse(other.number, self.prime) {
+            let number = modular_mul(self.number, inv, self.prime);
             FieldElement::new(number, self.prime)
         } else {
             panic!("No multiplicative inverse exists for {}", other.number);
         }
     }
+}
+
+// Modular addition
+fn modular_add(a: U256, b: U256, modulus: U256) -> U256 {
+    let (result, overflow) = a.overflowing_add(b);
+    if overflow || result >= modulus {
+        result.overflowing_sub(modulus).0
+    } else {
+        result
+    }
+}
+
+// Modular subtraction
+fn modular_sub(a: U256, b: U256, modulus: U256) -> U256 {
+    if a >= b {
+        a - b
+    } else {
+        let (result, _) = modulus.overflowing_sub(b - a);
+        result
+    }
+}
+
+// Modular multiplication
+fn modular_mul(a: U256, b: U256, modulus: U256) -> U256 {
+    let mut result = U256::zero();
+    let mut temp_a = a;
+    let mut temp_b = b;
+
+    while !temp_b.is_zero() {
+        if temp_b.low_u64() & 1 == 1 {
+            let (new_result, overflow) = result.overflowing_add(temp_a);
+            result = if overflow || new_result >= modulus {
+                new_result.overflowing_sub(modulus).0
+            } else {
+                new_result
+            };
+        }
+        temp_a = temp_a.overflowing_add(temp_a).0;
+        if temp_a >= modulus {
+            temp_a = temp_a.overflowing_sub(modulus).0;
+        }
+        temp_b = temp_b >> 1;
+    }
+
+    result
+}
+
+// Modular inverse using the Extended Euclidean Algorithm
+fn modular_inverse(a: U256, modulus: U256) -> Option<U256> {
+    let mut t = U256::zero();
+    let mut new_t = U256::one();
+    let mut r = modulus;
+    let mut new_r = a;
+
+    while !new_r.is_zero() {
+        let quotient = r / new_r;
+
+        let temp_t = t;
+        t = new_t;
+        new_t = modular_sub(temp_t, modular_mul(quotient, new_t, modulus), modulus);
+
+        let temp_r = r;
+        r = new_r;
+        new_r = temp_r - quotient * new_r;
+    }
+
+    if r > U256::one() {
+        return None; // No inverse exists
+    }
+
+    if t < U256::zero() {
+        t = t + modulus;
+    }
+
+    Some(t)
+}
+
+// Modular exponentiation
+fn modular_pow(base: U256, exponent: U256, modulus: U256) -> U256 {
+    let mut result = U256::one();
+    let mut base = base % modulus;
+    let mut exponent = exponent;
+
+    while !exponent.is_zero() {
+        if exponent.low_u64() & 1 == 1 {
+            result = modular_mul(result, base, modulus);
+        }
+        exponent = exponent >> 1;
+        base = modular_mul(base, base, modulus);
+    }
+
+    result
 }
 
 #[cfg(test)]
