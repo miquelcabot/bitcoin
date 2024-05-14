@@ -1,8 +1,8 @@
 mod field_element;
-//mod point;
+mod point;
 
 use field_element::{FieldElement, U256};
-//use point::Point;
+use point::Point;
 
 fn main() {
     // FieldElement
@@ -23,7 +23,7 @@ fn main() {
     println!("{}", a / b);
 
     // Point
-    /*let prime = 223;
+    let prime = 223;
     let a = FieldElement::new(0, prime);
     let b = FieldElement::new(7, prime);
     let x = Point::new(
@@ -59,5 +59,5 @@ fn main() {
     println!("{}", z * 6);
     println!("{}", 6 * z);
     println!("{}", z * 7);
-    println!("{}", 7 * z);*/
+    println!("{}", 7 * z);
 }

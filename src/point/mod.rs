@@ -1,4 +1,4 @@
-use super::field_element::FieldElement;
+use crate::field_element::{FieldElement, U256};
 use std::{fmt, ops};
 
 #[derive(Debug, Copy, Clone)]
@@ -16,10 +16,10 @@ impl fmt::Display for Point {
             Some(x) => write!(
                 f,
                 "Point({},{})_{}_{} in F_{}",
-                x.get_num(),
-                self.y.unwrap().get_num(),
-                self.a.get_num(),
-                self.b.get_num(),
+                x.get_number(),
+                self.y.unwrap().get_number(),
+                self.a.get_number(),
+                self.b.get_number(),
                 self.a.get_prime()
             ),
         }
@@ -50,17 +50,17 @@ impl ops::Add for Point {
                 }
                 // Handling the doubling case
                 if self == other {
-                    let num = 3 * x1.pow(2) + self.a;
+                    let num = 3 * x1.pow(U256::from(2)) + self.a;
                     let denom = 2 * self.y.unwrap();
                     let s = num / denom;
-                    let x3 = s.pow(2) - 2 * x1;
+                    let x3 = s.pow(U256::from(2)) - 2 * x1;
                     let y3 = s * (x1 - x3) - self.y.unwrap();
                     return Point::new(Some(x3), Some(y3), self.a, self.b);
                 }
             }
             (Some(x1), Some(x2)) => {
                 let s = (other.y.unwrap() - self.y.unwrap()) / (x2 - x1);
-                let x3 = s.pow(2) - x1 - x2;
+                let x3 = s.pow(U256::from(2)) - x1 - x2;
                 let y3 = s * (x1 - x3) - self.y.unwrap();
                 return Point::new(Some(x3), Some(y3), self.a, self.b);
             }
@@ -121,7 +121,7 @@ impl Point {
     ) -> Self {
         match (x, y) {
             (Some(x_val), Some(y_val)) => {
-                if y_val.pow(2) != x_val.pow(3) + a * x_val + b {
+                if y_val.pow(U256::from(2)) != x_val.pow(U256::from(3)) + a * x_val + b {
                     panic!("({}, {}) is not on the curve", x_val, y_val);
                 }
             }
@@ -151,10 +151,10 @@ mod tests {
             assert_eq!(
                 format!(
                     "Point({},{})_{}_{} in F_{}",
-                    p.x.unwrap().get_num(),
-                    p.y.unwrap().get_num(),
-                    p.a.get_num(),
-                    p.b.get_num(),
+                    p.x.unwrap().get_number(),
+                    p.y.unwrap().get_number(),
+                    p.a.get_number(),
+                    p.b.get_number(),
                     p.a.get_prime()
                 ),
                 p.to_string()
