@@ -8,20 +8,20 @@ construct_uint! {
 
 #[derive(Debug, Copy, Clone)]
 pub struct FieldElement {
-    num: U256,
+    number: U256,
     prime: U256,
 }
 
 impl fmt::Display for FieldElement {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "FieldElement({} in F_{})", self.num, self.prime)
+        write!(f, "FieldElement({} in F_{})", self.number, self.prime)
     }
 }
 
 // Equality is automatically derived and does not need to be manually implemented
 impl PartialEq for FieldElement {
     fn eq(&self, other: &Self) -> bool {
-        self.num == other.num && self.prime == other.prime
+        self.number == other.number && self.prime == other.prime
     }
 }
 
@@ -33,8 +33,8 @@ impl ops::Add for FieldElement {
         if self.prime != other.prime {
             panic!("Cannot operate with two numbers in different Fields");
         }
-        let num = Self::modulo(self.num + other.num, self.prime);
-        FieldElement::new(num, self.prime)
+        let number = Self::modulo(self.number + other.number, self.prime);
+        FieldElement::new(number, self.prime)
     }
 }
 
@@ -46,8 +46,8 @@ impl ops::Sub for FieldElement {
         if self.prime != other.prime {
             panic!("Cannot operate with two numbers in different Fields");
         }
-        let num = Self::modulo(self.num + self.prime - other.num, self.prime); // Ensuring positive result
-        FieldElement::new(num, self.prime)
+        let number = Self::modulo(self.number + self.prime - other.number, self.prime); // Ensuring positive result
+        FieldElement::new(number, self.prime)
     }
 }
 
@@ -59,8 +59,8 @@ impl ops::Mul<Self> for FieldElement {
         if self.prime != other.prime {
             panic!("Cannot operate with two numbers in different Fields");
         }
-        let num = Self::modulo(self.num * other.num, self.prime);
-        FieldElement::new(num, self.prime)
+        let number = Self::modulo(self.number * other.number, self.prime);
+        FieldElement::new(number, self.prime)
     }
 }
 
@@ -69,8 +69,8 @@ impl ops::Mul<i32> for FieldElement {
     type Output = Self;
 
     fn mul(self, other: i32) -> Self {
-        let num = Self::modulo(self.num * U256::from(other), self.prime);
-        FieldElement::new(num, self.prime)
+        let number = Self::modulo(self.number * U256::from(other), self.prime);
+        FieldElement::new(number, self.prime)
     }
 }
 
@@ -91,16 +91,16 @@ impl ops::Div for FieldElement {
             panic!("Cannot operate with two numbers in different Fields");
         }
         // Calculate other's multiplicative inverse using Fermat's Little Theorem
-        let inv = Self::mod_pow(other.num, self.prime - 2, self.prime);
-        let num = Self::modulo(self.num * inv, self.prime);
-        FieldElement::new(num, self.prime)
+        let inv = Self::mod_pow(other.number, self.prime - 2, self.prime);
+        let number = Self::modulo(self.number * inv, self.prime);
+        FieldElement::new(number, self.prime)
     }
 }
 
 impl FieldElement {
-    // Getter for num
+    // Getter for number
     pub fn get_num(&self) -> U256 {
-        self.num
+        self.number
     }
 
     // Getter for prime
@@ -109,8 +109,8 @@ impl FieldElement {
     }
 
     // Constructs a new FieldElement, ensuring the value is within the field range
-    pub fn new<T: Into<U256>>(num: T, prime: T) -> Self {
-        let num_u256 = num.into();
+    pub fn new<T: Into<U256>>(number: T, prime: T) -> Self {
+        let num_u256 = number.into();
         let prime_u256 = prime.into();
 
         if num_u256 >= prime_u256 || num_u256 < U256::from(0) {
@@ -121,7 +121,7 @@ impl FieldElement {
             );
         }
         Self {
-            num: num_u256,
+            number: num_u256,
             prime: prime_u256,
         }
     }
@@ -129,8 +129,8 @@ impl FieldElement {
     // Exponentiates a FieldElement value
     pub fn pow(&self, exponent: U256) -> Self {
         let n = Self::modulo(exponent, self.prime - 1);
-        let num = Self::mod_pow(self.num, n, self.prime);
-        FieldElement::new(num, self.prime)
+        let number = Self::mod_pow(self.number, n, self.prime);
+        FieldElement::new(number, self.prime)
     }
 
     fn modulo(a: U256, b: U256) -> U256 {
@@ -176,7 +176,7 @@ mod tests {
     #[test]
     fn test_new() {
         let a = FieldElement::new(2, 31);
-        assert_eq!(a.num, U256::from(2));
+        assert_eq!(a.number, U256::from(2));
         assert_eq!(a.prime, U256::from(31));
         assert_eq!(a.get_num(), U256::from(2));
         assert_eq!(a.get_prime(), U256::from(31));
