@@ -1,9 +1,15 @@
 use std::{fmt, ops};
+use uint::construct_uint;
+
+// U256 with 256 bits consisting of 4 x 64-bit words
+construct_uint! {
+    pub struct U256(4);
+}
 
 #[derive(Debug, Copy, Clone)]
 pub struct FieldElement {
-    num: i64,
-    prime: i64,
+    num: U256,
+    prime: U256,
 }
 
 impl fmt::Display for FieldElement {
@@ -40,7 +46,7 @@ impl ops::Sub for FieldElement {
         if self.prime != other.prime {
             panic!("Cannot operate with two numbers in different Fields");
         }
-        let num = Self::modulo(self.num - other.num + self.prime, self.prime); // Ensuring positive result
+        let num = Self::modulo(self.num + self.prime - other.num, self.prime); // Ensuring positive result
         FieldElement::new(num, self.prime)
     }
 }
@@ -63,7 +69,7 @@ impl ops::Mul<i32> for FieldElement {
     type Output = Self;
 
     fn mul(self, other: i32) -> Self {
-        let num = Self::modulo(self.num * (other as i64), self.prime);
+        let num = Self::modulo(self.num * U256::from(other), self.prime);
         FieldElement::new(num, self.prime)
     }
 }
@@ -93,49 +99,67 @@ impl ops::Div for FieldElement {
 
 impl FieldElement {
     // Getter for num
-    pub fn get_num(&self) -> i64 {
+    pub fn get_num(&self) -> U256 {
         self.num
     }
 
     // Getter for prime
-    pub fn get_prime(&self) -> i64 {
+    pub fn get_prime(&self) -> U256 {
         self.prime
     }
 
     // Constructs a new FieldElement, ensuring the value is within the field range
-    pub fn new(num: i64, prime: i64) -> Self {
-        if num >= prime || num < 0 {
-            panic!("Num {} not in field range 0 to {}", num, prime - 1);
+    pub fn new<T: Into<U256>>(num: T, prime: T) -> Self {
+        let num_u256 = num.into();
+        let prime_u256 = prime.into();
+
+        if num_u256 >= prime_u256 || num_u256 < U256::from(0) {
+            panic!(
+                "Num {} not in field range 0 to {}",
+                num_u256,
+                prime_u256 - 1
+            );
         }
-        Self { num, prime }
+        Self {
+            num: num_u256,
+            prime: prime_u256,
+        }
     }
 
     // Exponentiates a FieldElement value
-    pub fn pow(&self, exponent: i64) -> Self {
+    pub fn pow(&self, exponent: U256) -> Self {
         let n = Self::modulo(exponent, self.prime - 1);
         let num = Self::mod_pow(self.num, n, self.prime);
         FieldElement::new(num, self.prime)
     }
 
-    fn modulo(a: i64, b: i64) -> i64 {
+    fn modulo(a: U256, b: U256) -> U256 {
         let r = a % b;
-        if r < 0 {
-            r + b.abs()
+        if r < U256::from(0) {
+            r + Self::abs(b)
         } else {
             r
         }
     }
 
-    fn mod_pow(x: i64, y: i64, z: i64) -> i64 {
-        if z == 1 {
-            return 0;
+    fn abs(a: U256) -> U256 {
+        if a < U256::from(0) {
+          a.overflowing_neg().0
+        } else {
+            a
         }
-        let mut result = 1;
+    }
+
+    fn mod_pow(x: U256, y: U256, z: U256) -> U256 {
+        if z == U256::from(1) {
+            return U256::from(0);
+        }
+        let mut result = U256::from(1);
         let mut base = x % z;
         let mut exponent = y;
 
-        while exponent > 0 {
-            if exponent % 2 == 1 {
+        while exponent > U256::from(0) {
+            if exponent % 2 == U256::from(1) {
                 result = result * base % z;
             }
             exponent >>= 1;
@@ -152,10 +176,10 @@ mod tests {
     #[test]
     fn test_new() {
         let a = FieldElement::new(2, 31);
-        assert_eq!(a.num, 2);
-        assert_eq!(a.prime, 31);
-        assert_eq!(a.get_num(), 2);
-        assert_eq!(a.get_prime(), 31);
+        assert_eq!(a.num, U256::from(2));
+        assert_eq!(a.prime, U256::from(31));
+        assert_eq!(a.get_num(), U256::from(2));
+        assert_eq!(a.get_prime(), U256::from(31));
     }
 
     #[test]
@@ -211,10 +235,10 @@ mod tests {
     #[test]
     fn test_pow() {
         let a = FieldElement::new(17, 31);
-        assert_eq!(a.pow(3), FieldElement::new(15, 31));
+        assert_eq!(a.pow(U256::from(3)), FieldElement::new(15, 31));
         let a = FieldElement::new(5, 31);
         let b = FieldElement::new(18, 31);
-        assert_eq!(a.pow(5) * b, FieldElement::new(16, 31));
+        assert_eq!(a.pow(U256::from(5)) * b, FieldElement::new(16, 31));
     }
 
     #[test]
@@ -222,10 +246,5 @@ mod tests {
         let a = FieldElement::new(3, 31);
         let b = FieldElement::new(24, 31);
         assert_eq!(a / b, FieldElement::new(4, 31));
-        let a = FieldElement::new(17, 31);
-        assert_eq!(a.pow(-3), FieldElement::new(29, 31));
-        let a = FieldElement::new(4, 31);
-        let b = FieldElement::new(11, 31);
-        assert_eq!(a.pow(-4) * b, FieldElement::new(13, 31));
     }
 }
