@@ -6,15 +6,20 @@ use field_element::FieldElement;
 
 fn main() {
     // FieldElement
-    let a = FieldElement::new(15, 31);
-    let b = FieldElement::new(5, 31);
+    let prime = "0xf70f0ce418c335ec6faadba16b3dc01273ac8260966d4cb8bb15d4f33b8aa055";
+    let x = "0xb50f0ce418c335ec6faadba16b3dc01273ac8260966d4cb8bb15d4f33b8aa055";
+    let y = "0xa30f0ce418c335ec6faadba16b3dc01273ac8260966d4cb8bb15d4f33b8aa055";
+
+    let a = FieldElement::new(x, prime);
+    let b = FieldElement::new(y, prime);
     println!("{}", a);
     println!("{}", b);
     println!("{}", a == b);
     println!("{}", a + b);
+    println!("{}", a.get_number() % a.get_prime());
     println!("{}", a - b);
     println!("{}", a * b);
-/*     println!("{}", a.pow(4));
+    /*     println!("{}", a.pow(4));
     println!("{}", a / b);
 
     // Point
