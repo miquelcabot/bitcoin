@@ -99,7 +99,7 @@ impl ops::Div for FieldElement {
 
 impl FieldElement {
     // Getter for number
-    pub fn get_num(&self) -> U256 {
+    pub fn get_number(&self) -> U256 {
         self.number
     }
 
@@ -178,7 +178,7 @@ mod tests {
         let a = FieldElement::new(2, 31);
         assert_eq!(a.number, U256::from(2));
         assert_eq!(a.prime, U256::from(31));
-        assert_eq!(a.get_num(), U256::from(2));
+        assert_eq!(a.get_number(), U256::from(2));
         assert_eq!(a.get_prime(), U256::from(31));
     }
 
