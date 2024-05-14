@@ -142,7 +142,7 @@ impl FieldElement {
 
 impl fmt::Display for FieldElement {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "FieldElement({} in F_{})", self.number, self.prime)
+        write!(f, "FieldElement({:x} in F_{:x})", self.number, self.prime)
     }
 }
 
