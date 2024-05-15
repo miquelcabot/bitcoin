@@ -50,7 +50,7 @@ impl FieldElement {
 
 impl fmt::Display for FieldElement {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "FieldElement({:x} in F_{:x})", self.number, self.prime)
+        write!(f, "FieldElement({} in F_{})", self.number, self.prime)
     }
 }
 
@@ -205,8 +205,8 @@ fn modular_inverse(a: U256, modulus: U256) -> Option<U256> {
         return None; // No inverse exists
     }
 
-    if t < U256::zero() {
-        t = t + modulus;
+    if t < U256::one() {
+        return None; // No inverse exists
     }
 
     Some(t)
