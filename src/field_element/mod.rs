@@ -1,5 +1,5 @@
 use num_bigint::BigUint;
-use std::{fmt::Display, ops::Add};
+use std::{fmt::Display, ops::{Add, Mul, Sub}};
 
 #[derive(Debug, Clone)]
 pub struct FieldElement {
@@ -67,33 +67,40 @@ impl Add for FieldElement {
         }
     }
 }
-/*
+
 // Subtracts two FieldElement values
-impl ops::Sub for FieldElement {
+impl Sub for FieldElement {
     type Output = Self;
 
     fn sub(self, other: Self) -> Self {
         if self.prime != other.prime {
             panic!("Cannot operate with two numbers in different Fields");
         }
-        let num = Self::modulo(self.num + self.prime - other.num, self.prime); // Ensuring positive result
-        FieldElement::new(num, self.prime)
+
+        FieldElement {
+          // Ensuring positive result
+          number: (&self.number + &self.prime - &other.number) % &self.prime, 
+          prime: self.prime.clone(),
+        }
     }
 }
 
 // Multiplies two FieldElement values
-impl ops::Mul<Self> for FieldElement {
+impl Mul<Self> for FieldElement {
     type Output = Self;
 
     fn mul(self, other: Self) -> Self {
         if self.prime != other.prime {
             panic!("Cannot operate with two numbers in different Fields");
         }
-        let num = Self::modulo(self.num * other.num, self.prime);
-        FieldElement::new(num, self.prime)
+
+        FieldElement {
+          number: (&self.number * &other.number) % &self.prime, 
+          prime: self.prime.clone(),
+        }
     }
 }
-
+/*
 // Multiplies a FieldElement by a scalar
 impl ops::Mul<i32> for FieldElement {
     type Output = Self;
