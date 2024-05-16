@@ -28,8 +28,8 @@ impl FieldElement {
     }
 
     pub fn from_bytes(number: &[u8], prime: &[u8]) -> FieldElement {
-        let number = BigUint::from_bytes_be(number);
-        let prime = BigUint::from_bytes_be(prime);
+        let number = BigUint::parse_bytes(number, 16).unwrap();
+        let prime = BigUint::parse_bytes(prime, 16).unwrap();
         if number >= prime {
             panic!(
                 "Num {} not in field range 0 to {}",
@@ -176,15 +176,19 @@ mod tests {
         );
         assert_eq!(
             a.number,
-            BigUint::from_bytes_be(
-                b"5a3028a13c7c5b0b455c155198de1a4b3a75a9009b972cd17577c0bd6a3a0949"
+            BigUint::parse_bytes(
+                b"5a3028a13c7c5b0b455c155198de1a4b3a75a9009b972cd17577c0bd6a3a0949",
+                16
             )
+            .unwrap()
         );
         assert_eq!(
             a.prime,
-            BigUint::from_bytes_be(
-                b"f70f0ce418c335ec6faadba16b3dc01273ac8260966d4cb8bb15d4f33b8aa055"
+            BigUint::parse_bytes(
+                b"f70f0ce418c335ec6faadba16b3dc01273ac8260966d4cb8bb15d4f33b8aa055",
+                16
             )
+            .unwrap()
         );
     }
 
@@ -216,6 +220,26 @@ mod tests {
         let a = FieldElement::from_int(17, 31);
         let b = FieldElement::from_int(21, 31);
         assert_eq!(a + b, FieldElement::from_int(7, 31));
+
+        let prime = b"f70f0ce418c335ec6faadba16b3dc01273ac8260966d4cb8bb15d4f33b8aa055";
+        let a = FieldElement::from_bytes(
+            b"5a3028a13c7c5b0b455c155198de1a4b3a75a9009b972cd17577c0bd6a3a0949",
+            prime,
+        );
+        let b = FieldElement::from_bytes(
+            b"c23051f0a7a42d04bd25d1d4f65b4e51a365d8df764ea0ad02f8f576008dec00",
+            prime,
+        );
+        println!("{:x}", a.get_number());
+        println!("{:x}", b.get_number());
+        println!("{}", a.get_prime());
+        assert_eq!(
+            a + b,
+            FieldElement::from_bytes(
+                b"25516dadcb5d522392d70b8523fba88a6a2eff7f7b7880c5bd5ae1402f3d54f4",
+                prime
+            )
+        );
     }
     /*
     #[test]

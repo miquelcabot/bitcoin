@@ -9,7 +9,7 @@ fn main() {
     // FieldElement
     let prime = b"f70f0ce418c335ec6faadba16b3dc01273ac8260966d4cb8bb15d4f33b8aa055";
     let x = b"5a3028a13c7c5b0b455c155198de1a4b3a75a9009b972cd17577c0bd6a3a0949";
-    let y = b"923051f0a7a42d04bd25d1d4f65b4e51a365d8df764ea0ad02f8f576008dec00";
+    let y = b"c23051f0a7a42d04bd25d1d4f65b4e51a365d8df764ea0ad02f8f576008dec00";
 
     let a = FieldElement::from_bytes(x, prime);
     let b = FieldElement::from_bytes(y, prime);
