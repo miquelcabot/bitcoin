@@ -153,7 +153,7 @@ mod tests {
 
     #[test]
     fn test_eq() {
-        let a = FieldElement::new(BigUint::from(2u32), BigUint::from(31u32));
+        let a = FieldElement::new(2u32, 31u32);
         let b = FieldElement::new(BigUint::from(2u32), BigUint::from(31u32));
         let c = FieldElement::new(BigUint::from(15u32), BigUint::from(31u32));
         assert_eq!(a, b);
@@ -161,17 +161,17 @@ mod tests {
         assert!(a == b);
         assert!(a != c);
     }
-    /*
+
     #[test]
     fn test_add() {
-        let a = FieldElement::new(2, 31);
-        let b = FieldElement::new(15, 31);
-        assert_eq!(a + b, FieldElement::new(17, 31));
-        let a = FieldElement::new(17, 31);
-        let b = FieldElement::new(21, 31);
-        assert_eq!(a + b, FieldElement::new(7, 31));
+        let a = FieldElement::new(BigUint::from(2u32), BigUint::from(31u32));
+        let b = FieldElement::new(BigUint::from(15u32), BigUint::from(31u32));
+        assert_eq!(a + b, FieldElement::new(BigUint::from(17u32), BigUint::from(31u32)));
+        let a = FieldElement::new(BigUint::from(17u32), BigUint::from(31u32));
+        let b = FieldElement::new(BigUint::from(21u32), BigUint::from(31u32));
+        assert_eq!(a + b, FieldElement::new(BigUint::from(7u32), BigUint::from(31u32)));
     }
-
+/* 
     #[test]
     fn test_sub() {
         let a = FieldElement::new(29, 31);
