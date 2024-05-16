@@ -24,26 +24,26 @@ fn main() {
     println!("{:x}", (5 * a.clone()).get_number());
     println!("{:x}", (a.clone() / b.clone()).get_number());
     println!("{:x}", a.clone().pow(5u32).get_number());
-    /*
+
     // Point
     let prime = 223;
-    let a = FieldElement::new(0, prime);
-    let b = FieldElement::new(7, prime);
+    let a = FieldElement::from_int(0, prime);
+    let b = FieldElement::from_int(7, prime);
     let x = Point::new(
-        Some(FieldElement::new(192, prime)),
-        Some(FieldElement::new(105, prime)),
-        a,
-        b,
+        Some(FieldElement::from_int(192, prime)),
+        Some(FieldElement::from_int(105, prime)),
+        a.clone(),
+        b.clone(),
     );
     let y = Point::new(
-        Some(FieldElement::new(17, prime)),
-        Some(FieldElement::new(56, prime)),
-        a,
-        b,
+        Some(FieldElement::from_int(17, prime)),
+        Some(FieldElement::from_int(56, prime)),
+        a.clone(),
+        b.clone(),
     );
     println!("{}", x);
     println!("{}", y);
-    println!("{}", x + y);
+    println!("{}", x.clone() + y.clone());
 
     println!(
         "{}, {}, {}, {}",
@@ -54,13 +54,13 @@ fn main() {
     );
 
     let z = Point::new(
-        Some(FieldElement::new(15, prime)),
-        Some(FieldElement::new(86, prime)),
-        a,
-        b,
+        Some(FieldElement::from_int(15, prime)),
+        Some(FieldElement::from_int(86, prime)),
+        a.clone(),
+        b.clone(),
     );
-    println!("{}", z * 6);
-    println!("{}", 6 * z);
-    println!("{}", z * 7);
-    println!("{}", 7 * z);*/
+    println!("{}", z.clone() * 6);
+    println!("{}", 6 * z.clone());
+    println!("{}", z.clone() * 7);
+    println!("{}", 7 * z.clone());
 }
