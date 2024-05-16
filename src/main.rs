@@ -7,12 +7,12 @@ use num_bigint::BigUint;
 
 fn main() {
     // FieldElement
-    let prime = BigUint::parse_bytes(b"f70f0ce418c335ec6faadba16b3dc01273ac8260966d4cb8bb15d4f33b8aa055", 16).unwrap();
-    let x = BigUint::parse_bytes(b"5a3028a13c7c5b0b455c155198de1a4b3a75a9009b972cd17577c0bd6a3a0949", 16).unwrap();
-    let y = BigUint::parse_bytes(b"923051f0a7a42d04bd25d1d4f65b4e51a365d8df764ea0ad02f8f576008dec00", 16).unwrap();
+    let prime = b"f70f0ce418c335ec6faadba16b3dc01273ac8260966d4cb8bb15d4f33b8aa055";
+    let x = b"5a3028a13c7c5b0b455c155198de1a4b3a75a9009b972cd17577c0bd6a3a0949";
+    let y = b"923051f0a7a42d04bd25d1d4f65b4e51a365d8df764ea0ad02f8f576008dec00";
 
-    let a = FieldElement::new(x, prime.clone());
-    let b = FieldElement::new(y, prime.clone());
+    let a = FieldElement::from_bytes(x, prime);
+    let b = FieldElement::from_bytes(y, prime);
 
     println!("{:x}", a.get_number());
     println!("{:x}", b.get_number());
@@ -20,7 +20,7 @@ fn main() {
     println!("{:x}", (a.clone() + b.clone()).get_number());
     println!("{:x}", (a.clone() * b.clone()).get_number());
     println!("{:x}", (a.clone() - b.clone()).get_number());
-/*     println!("{}", a / b);
+    /*     println!("{}", a / b);
 
     let x = U256::from("0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81797");
     let y = U256::from("0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798");

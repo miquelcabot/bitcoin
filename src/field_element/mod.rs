@@ -1,5 +1,8 @@
 use num_bigint::BigUint;
-use std::{fmt::Display, ops::{Add, Mul, Sub}};
+use std::{
+    fmt::Display,
+    ops::{Add, Mul, Sub},
+};
 
 #[derive(Debug, Clone)]
 pub struct FieldElement {
@@ -9,11 +12,25 @@ pub struct FieldElement {
 
 impl FieldElement {
     // Constructs a new FieldElement, ensuring the value is within the field range
-    pub fn new(number: impl Into<BigUint>, prime: impl Into<BigUint>) -> FieldElement {
-        let number = number.into();
-        let prime = prime.into();
+    pub fn from_int(number: u32, prime: u32) -> FieldElement {
+        if number >= prime {
+            panic!(
+                "Num {} not in field range 0 to {}",
+                number,
+                prime - BigUint::from(1u32)
+            );
+        }
 
-        if &number >= &prime {
+        FieldElement {
+            number: BigUint::from(number),
+            prime: BigUint::from(prime),
+        }
+    }
+
+    pub fn from_bytes(number: &[u8], prime: &[u8]) -> FieldElement {
+        let number = BigUint::from_bytes_be(number);
+        let prime = BigUint::from_bytes_be(prime);
+        if number >= prime {
             panic!(
                 "Num {} not in field range 0 to {}",
                 number,
@@ -78,9 +95,9 @@ impl Sub for FieldElement {
         }
 
         FieldElement {
-          // Ensuring positive result
-          number: (&self.number + &self.prime - &other.number) % &self.prime, 
-          prime: self.prime.clone(),
+            // Ensuring positive result
+            number: (&self.number + &self.prime - &other.number) % &self.prime,
+            prime: self.prime.clone(),
         }
     }
 }
@@ -95,8 +112,8 @@ impl Mul<Self> for FieldElement {
         }
 
         FieldElement {
-          number: (&self.number * &other.number) % &self.prime, 
-          prime: self.prime.clone(),
+            number: (&self.number * &other.number) % &self.prime,
+            prime: self.prime.clone(),
         }
     }
 }
@@ -139,23 +156,52 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_new() {
-        let a = FieldElement::new(2u32, 31u32);
+    fn test_from_int() {
+        let a = FieldElement::from_int(2, 31);
         assert_eq!(a.number, BigUint::from(2u32));
         assert_eq!(a.prime, BigUint::from(31u32));
     }
 
     #[test]
     #[should_panic]
-    fn test_new_panic() {
-        FieldElement::new(32u32, 31u32);
+    fn test_from_int_panic() {
+        FieldElement::from_int(32, 31);
+    }
+
+    #[test]
+    fn test_from_bytes() {
+        let a = FieldElement::from_bytes(
+            b"5a3028a13c7c5b0b455c155198de1a4b3a75a9009b972cd17577c0bd6a3a0949",
+            b"f70f0ce418c335ec6faadba16b3dc01273ac8260966d4cb8bb15d4f33b8aa055",
+        );
+        assert_eq!(
+            a.number,
+            BigUint::from_bytes_be(
+                b"5a3028a13c7c5b0b455c155198de1a4b3a75a9009b972cd17577c0bd6a3a0949"
+            )
+        );
+        assert_eq!(
+            a.prime,
+            BigUint::from_bytes_be(
+                b"f70f0ce418c335ec6faadba16b3dc01273ac8260966d4cb8bb15d4f33b8aa055"
+            )
+        );
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_from_bytes_panic() {
+        FieldElement::from_bytes(
+            b"5a3028a13c7c5b0b455c155198de1a4b3a75a9009b972cd17577c0bd6a3a0949",
+            b"070f0ce418c335ec6faadba16b3dc01273ac8260966d4cb8bb15d4f33b8aa055",
+        );
     }
 
     #[test]
     fn test_eq() {
-        let a = FieldElement::new(2u32, 31u32);
-        let b = FieldElement::new(BigUint::from(2u32), BigUint::from(31u32));
-        let c = FieldElement::new(BigUint::from(15u32), BigUint::from(31u32));
+        let a = FieldElement::from_int(2, 31);
+        let b = FieldElement::from_int(2, 31);
+        let c = FieldElement::from_int(15, 31);
         assert_eq!(a, b);
         assert_ne!(a, c);
         assert!(a == b);
@@ -164,14 +210,14 @@ mod tests {
 
     #[test]
     fn test_add() {
-        let a = FieldElement::new(BigUint::from(2u32), BigUint::from(31u32));
-        let b = FieldElement::new(BigUint::from(15u32), BigUint::from(31u32));
-        assert_eq!(a + b, FieldElement::new(BigUint::from(17u32), BigUint::from(31u32)));
-        let a = FieldElement::new(BigUint::from(17u32), BigUint::from(31u32));
-        let b = FieldElement::new(BigUint::from(21u32), BigUint::from(31u32));
-        assert_eq!(a + b, FieldElement::new(BigUint::from(7u32), BigUint::from(31u32)));
+        let a = FieldElement::from_int(2, 31);
+        let b = FieldElement::from_int(15, 31);
+        assert_eq!(a + b, FieldElement::from_int(17, 31));
+        let a = FieldElement::from_int(17, 31);
+        let b = FieldElement::from_int(21, 31);
+        assert_eq!(a + b, FieldElement::from_int(7, 31));
     }
-/* 
+    /*
     #[test]
     fn test_sub() {
         let a = FieldElement::new(29, 31);
