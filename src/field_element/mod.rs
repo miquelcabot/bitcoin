@@ -1,7 +1,7 @@
 use num_bigint::BigUint;
 use std::{
     fmt::Display,
-    ops::{Add, Mul, Sub},
+    ops::{Add, Div, Mul, Sub},
 };
 
 #[derive(Debug, Clone)]
@@ -124,9 +124,9 @@ impl Mul<u32> for FieldElement {
 
     fn mul(self, other: u32) -> Self {
         FieldElement {
-          number: (&self.number * BigUint::from(other)) % &self.prime,
-          prime: self.prime.clone(),
-      }
+            number: (&self.number * BigUint::from(other)) % &self.prime,
+            prime: self.prime.clone(),
+        }
     }
 }
 
@@ -137,9 +137,9 @@ impl Mul<FieldElement> for u32 {
         other * self
     }
 }
-/*
+
 // Divides one FieldElement by another using Fermat's Little Theorem
-impl ops::Div for FieldElement {
+impl Div for FieldElement {
     type Output = Self;
 
     fn div(self, other: Self) -> Self {
@@ -147,11 +147,16 @@ impl ops::Div for FieldElement {
             panic!("Cannot operate with two numbers in different Fields");
         }
         // Calculate other's multiplicative inverse using Fermat's Little Theorem
-        let inv = Self::mod_pow(other.num, self.prime - 2, self.prime);
-        let num = Self::modulo(self.num * inv, self.prime);
-        FieldElement::new(num, self.prime)
+        let inv = &other
+            .number
+            .modpow(&(&self.prime - BigUint::from(2u32)), &self.prime);
+        let num = (&self.number * inv) & self.prime;
+        FieldElement {
+            number: num,
+            prime: self.prime.clone(),
+        }
     }
-} */
+}
 
 #[cfg(test)]
 mod tests {
@@ -266,7 +271,7 @@ mod tests {
         let a = FieldElement::from_int(24, 31);
         assert_eq!(2 * a.clone(), a.clone() + a.clone());
     }
-/*
+    /*
     #[test]
     fn test_pow() {
         let a = FieldElement::new(17, 31);
