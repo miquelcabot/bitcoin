@@ -74,7 +74,7 @@ impl Add for FieldElement {
     type Output = Self;
 
     fn add(self, other: Self) -> Self {
-        if &self.prime != &other.prime {
+        if self.prime != other.prime {
             panic!("Cannot operate with two numbers in different Fields");
         }
 

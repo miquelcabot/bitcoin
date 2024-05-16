@@ -2,7 +2,6 @@ mod field_element;
 //mod point;
 
 use field_element::FieldElement;
-use num_bigint::BigUint;
 //use point::Point;
 
 fn main() {
