@@ -117,25 +117,27 @@ impl Mul<Self> for FieldElement {
         }
     }
 }
-/*
+
 // Multiplies a FieldElement by a scalar
-impl ops::Mul<i32> for FieldElement {
+impl Mul<u32> for FieldElement {
     type Output = Self;
 
-    fn mul(self, other: i32) -> Self {
-        let num = Self::modulo(self.num * U256::from(other), self.prime);
-        FieldElement::new(num, self.prime)
+    fn mul(self, other: u32) -> Self {
+        FieldElement {
+          number: (&self.number * BigUint::from(other)) % &self.prime,
+          prime: self.prime.clone(),
+      }
     }
 }
 
-impl ops::Mul<FieldElement> for i32 {
+impl Mul<FieldElement> for u32 {
     type Output = FieldElement;
 
     fn mul(self, other: FieldElement) -> FieldElement {
         other * self
     }
 }
-
+/*
 // Divides one FieldElement by another using Fermat's Little Theorem
 impl ops::Div for FieldElement {
     type Output = Self;
@@ -241,30 +243,30 @@ mod tests {
             )
         );
     }
-    /*
+
     #[test]
     fn test_sub() {
-        let a = FieldElement::new(29, 31);
-        let b = FieldElement::new(4, 31);
-        assert_eq!(a - b, FieldElement::new(25, 31));
-        let a = FieldElement::new(15, 31);
-        let b = FieldElement::new(30, 31);
-        assert_eq!(a - b, FieldElement::new(16, 31));
+        let a = FieldElement::from_int(29, 31);
+        let b = FieldElement::from_int(4, 31);
+        assert_eq!(a - b, FieldElement::from_int(25, 31));
+        let a = FieldElement::from_int(15, 31);
+        let b = FieldElement::from_int(30, 31);
+        assert_eq!(a - b, FieldElement::from_int(16, 31));
     }
 
     #[test]
     fn test_mul() {
-        let a = FieldElement::new(24, 31);
-        let b = FieldElement::new(19, 31);
-        assert_eq!(a * b, FieldElement::new(22, 31));
+        let a = FieldElement::from_int(24, 31);
+        let b = FieldElement::from_int(19, 31);
+        assert_eq!(a * b, FieldElement::from_int(22, 31));
     }
 
     #[test]
     fn test_scalarmul() {
-        let a = FieldElement::new(24, 31);
-        assert_eq!(2 * a, a + a);
+        let a = FieldElement::from_int(24, 31);
+        assert_eq!(2 * a.clone(), a.clone() + a.clone());
     }
-
+/*
     #[test]
     fn test_pow() {
         let a = FieldElement::new(17, 31);

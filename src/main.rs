@@ -20,6 +20,10 @@ fn main() {
     println!("{:x}", (a.clone() + b.clone()).get_number());
     println!("{:x}", (a.clone() * b.clone()).get_number());
     println!("{:x}", (a.clone() - b.clone()).get_number());
+    println!("{:x}", (a.clone() - b.clone()).get_number());
+    println!("{:x}", (a.clone() * 5).get_number());
+    println!("{:x}", (5 * a.clone()).get_number());
+
     /*     println!("{}", a / b);
 
     let x = U256::from("0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81797");
