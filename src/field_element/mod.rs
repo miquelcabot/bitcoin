@@ -150,7 +150,7 @@ impl Div for FieldElement {
         let inv = &other
             .number
             .modpow(&(&self.prime - BigUint::from(2u32)), &self.prime);
-        let num = (&self.number * inv) & self.prime;
+        let num = (&self.number * inv) & &self.prime;
         FieldElement {
             number: num,
             prime: self.prime.clone(),
@@ -271,20 +271,20 @@ mod tests {
         let a = FieldElement::from_int(24, 31);
         assert_eq!(2 * a.clone(), a.clone() + a.clone());
     }
-    /*
+
     #[test]
     fn test_pow() {
-        let a = FieldElement::new(17, 31);
-        assert_eq!(a.pow(U256::from(3)), FieldElement::new(15, 31));
-        let a = FieldElement::new(5, 31);
-        let b = FieldElement::new(18, 31);
-        assert_eq!(a.pow(U256::from(5)) * b, FieldElement::new(16, 31));
+        let a = FieldElement::from_int(17, 31);
+        assert_eq!(a.pow(3u32), FieldElement::from_int(15, 31));
+        let a = FieldElement::from_int(5, 31);
+        let b = FieldElement::from_int(18, 31);
+        assert_eq!(a.pow(5u32) * b, FieldElement::from_int(16, 31));
     }
 
     #[test]
     fn test_div() {
-        let a = FieldElement::new(3, 31);
-        let b = FieldElement::new(24, 31);
-        assert_eq!(a / b, FieldElement::new(4, 31));
-    } */
+        let a = FieldElement::from_int(3, 31);
+        let b = FieldElement::from_int(24, 31);
+        assert_eq!(a / b, FieldElement::from_int(4, 31));
+    }
 }
