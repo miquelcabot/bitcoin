@@ -150,7 +150,7 @@ impl Div for FieldElement {
         let inv = &other
             .number
             .modpow(&(&self.prime - BigUint::from(2u32)), &self.prime);
-        let num = (&self.number * inv) & &self.prime;
+        let num = (&self.number * inv) % &self.prime;
         FieldElement {
             number: num,
             prime: self.prime.clone(),
