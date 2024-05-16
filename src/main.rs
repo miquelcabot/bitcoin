@@ -23,19 +23,8 @@ fn main() {
     println!("{:x}", (a.clone() - b.clone()).get_number());
     println!("{:x}", (a.clone() * 5).get_number());
     println!("{:x}", (5 * a.clone()).get_number());
-
-    /*     println!("{}", a / b);
-
-    let x = U256::from("0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81797");
-    let y = U256::from("0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798");
-    0xca8a71300f7abe90b6f502095fd5f3546f932759268114914cc36861775185a8a3b474b2ed3d74af5131800f6b91104c60d50e23454567808f4c086c6868c46d
-
-    let c = FieldElement::new(x, y);
-
-
-    let c = c.pow(U256::from(2));
-
-    println!("{}", c);*/
+    println!("{:x}", (a.clone() / b.clone()).get_number());
+    println!("{:x}", a.clone().pow(5u32).get_number());
     /*
     // Point
     let prime = 223;
