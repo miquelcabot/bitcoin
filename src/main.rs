@@ -1,8 +1,8 @@
 mod field_element;
-//mod point;
+mod point;
 
 use field_element::FieldElement;
-//use point::Point;
+use point::Point;
 
 fn main() {
     // FieldElement
