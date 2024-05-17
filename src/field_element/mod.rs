@@ -50,8 +50,9 @@ impl FieldElement {
     }
 
     pub fn pow(&self, exponent: impl Into<BigUint>) -> Self {
+        let n = &exponent.into() % (&self.prime - BigUint::from(1u32));
         FieldElement {
-            number: self.number.modpow(&exponent.into(), &self.prime),
+            number: self.number.modpow(&n, &self.prime),
             prime: self.prime.clone(),
         }
     }
