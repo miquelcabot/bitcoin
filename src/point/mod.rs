@@ -1,4 +1,5 @@
 use super::field_element::FieldElement;
+use num_bigint::BigUint;
 use std::{
     fmt::{Display, Formatter, Result},
     ops::{Add, Mul},
@@ -72,15 +73,15 @@ impl Add for Point {
     }
 }
 
-impl Mul<i32> for Point {
+impl Mul<BigUint> for Point {
     type Output = Self;
 
-    fn mul(self, other: i32) -> Self {
+    fn mul(self, other: BigUint) -> Self {
         let mut coef = other;
         let mut current = self.clone();
         let mut result = Point::new(None, None, self.a.clone(), self.b.clone());
-        while coef > 0 {
-            if coef & 1 == 1 {
+        while coef > BigUint::ZERO {
+            if &coef & BigUint::from(1u32) == BigUint::from(1u32) {
                 result = result + current.clone();
             }
             current = current.clone() + current;
@@ -90,7 +91,7 @@ impl Mul<i32> for Point {
     }
 }
 
-impl Mul<Point> for i32 {
+impl Mul<Point> for BigUint {
     type Output = Point;
 
     fn mul(self, other: Point) -> Point {
