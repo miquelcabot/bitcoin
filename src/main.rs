@@ -1,9 +1,11 @@
 mod field_element;
 mod point;
+mod secp256k1;
 
-use field_element::FieldElement;
+use crate::field_element::FieldElement;
+use crate::point::Point;
+use crate::secp256k1::Secp256k1;
 use num_bigint::BigUint;
-use point::Point;
 
 fn main() {
     // FieldElement
@@ -66,23 +68,10 @@ fn main() {
     println!("{}", BigUint::from(7u32) * z.clone());
 
     // secp256k1
-    // prime = 2^256 - 2^32 - 977
-    let prime = b"fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f";
-    let x = b"79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798";
-    let y = b"483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8";
+    let secp256k1: Secp256k1 = Secp256k1::new();
+    println!("{}", secp256k1.get_point());
+    println!("{}", secp256k1.get_point().clone() * BigUint::from(2u32));
 
-    let gx = FieldElement::from_bytes(x, prime);
-    let gy = FieldElement::from_bytes(y, prime);
-    let a = FieldElement::from_bytes(b"0", prime);
-    let b = FieldElement::from_bytes(b"7", prime);
-
-    let g = Point::new(Some(gx), Some(gy), a, b);
-    println!("{}", g);
-
-    let n = BigUint::parse_bytes(
-        b"fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141",
-        16,
-    )
-    .unwrap();
-    println!("{}", g * n);
+    let n = BigUint::parse_bytes(Secp256k1::BASE_ORDER, 16).unwrap();
+    println!("{}", secp256k1.get_point().clone() * n);
 }

@@ -1,4 +1,4 @@
-use super::field_element::FieldElement;
+use crate::field_element::FieldElement;
 use num_bigint::BigUint;
 use std::{
     fmt::{Display, Formatter, Result},
