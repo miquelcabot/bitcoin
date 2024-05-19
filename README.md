@@ -1,8 +1,6 @@
-# field_element_point
+# bitcoin
 
-This is a simple implementation of a field element point in Rust. It is a point on an elliptic curve over a finite field. The field is defined by a prime number and the curve is defined by two coefficients. The point is defined by its x and y coordinates.
-
-The point can be added to another point, negated, or multiplied by a scalar. The scalar multiplication is implemented using the double-and-add algorithm.
+This is a simple implementation of the secp256k1 elliptic curve in Rust. It is a work in progress and is not intended for production use. The goal is to implement the elliptic curve and the digital signature algorithm (ECDSA) used in Bitcoin.
 
 ## Installation
 
@@ -10,25 +8,20 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-field_element_point = "0.1.0"
+bitcoin = "0.1.0"
 ```
 
 ## Usage
 
 ```rust
-use field_element::FieldElement;
+use secp256k1::Secp256k1;
 
 fn main() {
-    let a = FieldElement::new(5, 7);
-    let b = FieldElement::new(3, 7);
-    let c = FieldElement::new(1, 7);
-    let d = FieldElement::new(1, 7);
+    let secp256k1: Secp256k1 = Secp256k1::new();
+    println!("{}", secp256k1.get_point());
+    println!("{}", secp256k1.get_point().clone() * BigUint::from(2u32));
 
-    let p1 = FieldElementPoint::new(a, b, c, d);
-    let p2 = FieldElementPoint::new(a, b, c, d);
-
-    let p3 = p1 + p2;
-    let p4 = p1 * 2;
-    let p5 = -p1;
+    let n = BigUint::parse_bytes(Secp256k1::BASE_ORDER, 16).unwrap();
+    println!("{}", secp256k1.get_point().clone() * n);
 }
 ```
