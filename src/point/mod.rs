@@ -13,6 +13,43 @@ pub struct Point {
     b: FieldElement,
 }
 
+impl Point {
+    pub fn get_x(&self) -> Option<&FieldElement> {
+        self.x.as_ref()
+    }
+
+    pub fn get_y(&self) -> Option<&FieldElement> {
+        self.y.as_ref()
+    }
+
+    pub fn get_a(&self) -> &FieldElement {
+        &self.a
+    }
+
+    pub fn get_b(&self) -> &FieldElement {
+        &self.b
+    }
+
+    // Constructs a new Point
+    pub fn new(
+        x: Option<FieldElement>,
+        y: Option<FieldElement>,
+        a: FieldElement,
+        b: FieldElement,
+    ) -> Self {
+        match (&x, &y) {
+            (Some(x_val), Some(y_val)) => {
+                if y_val.pow(2u32) != x_val.pow(3u32) + a.clone() * x_val.clone() + b.clone() {
+                    panic!("({}, {}) is not on the curve", x_val, y_val);
+                }
+            }
+            (None, None) => return Point { x, y, a, b },
+            _ => panic!("Incomplete point coordinates"),
+        }
+        Point { x, y, a, b }
+    }
+}
+
 impl Display for Point {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         match &self.x {
@@ -96,43 +133,6 @@ impl Mul<Point> for BigUint {
 
     fn mul(self, other: Point) -> Point {
         other * self
-    }
-}
-
-impl Point {
-    pub fn get_x(&self) -> Option<&FieldElement> {
-        self.x.as_ref()
-    }
-
-    pub fn get_y(&self) -> Option<&FieldElement> {
-        self.y.as_ref()
-    }
-
-    pub fn get_a(&self) -> &FieldElement {
-        &self.a
-    }
-
-    pub fn get_b(&self) -> &FieldElement {
-        &self.b
-    }
-
-    // Constructs a new Point
-    pub fn new(
-        x: Option<FieldElement>,
-        y: Option<FieldElement>,
-        a: FieldElement,
-        b: FieldElement,
-    ) -> Self {
-        match (&x, &y) {
-            (Some(x_val), Some(y_val)) => {
-                if y_val.pow(2u32) != x_val.pow(3u32) + a.clone() * x_val.clone() + b.clone() {
-                    panic!("({}, {}) is not on the curve", x_val, y_val);
-                }
-            }
-            (None, None) => return Point { x, y, a, b },
-            _ => panic!("Incomplete point coordinates"),
-        }
-        Point { x, y, a, b }
     }
 }
 
