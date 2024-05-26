@@ -2,9 +2,7 @@ use crate::field_element::FieldElement;
 use crate::point::Point;
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct Secp256k1 {
-    point: Point,
-}
+pub struct Secp256k1(Point);
 
 impl Secp256k1 {
     pub const A: &'static [u8; 1] = b"0";
@@ -25,12 +23,10 @@ impl Secp256k1 {
         let a = FieldElement::from_bytes(Self::A, Self::PRIME);
         let b = FieldElement::from_bytes(Self::B, Self::PRIME);
 
-        Self {
-            point: Point::new(Some(gx), Some(gy), a, b),
-        }
+        Secp256k1(Point::new(Some(gx), Some(gy), a, b))
     }
 
     pub fn get_point(&self) -> &Point {
-        &self.point
+        &self.0
     }
 }
