@@ -68,7 +68,7 @@ fn main() {
     println!("{}", BigUint::from(7u32) * z.clone());
 
     // S256Point
-    let s256point: S256Point = S256Point::new(S256Point::G_X, S256Point::G_Y);
+    let s256point: S256Point = S256Point::generator();
     println!("{}", s256point.get_point());
     println!("{}", s256point.get_point().clone() * BigUint::from(2u32));
 

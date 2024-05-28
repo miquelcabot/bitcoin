@@ -17,13 +17,24 @@ impl S256Point {
     pub const G_Y: &'static [u8; 64] =
         b"483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8";
 
-    pub fn new(x: &[u8], y: &[u8]) -> Self {
-        let gx = FieldElement::from_bytes(x, Self::PRIME);
-        let gy = FieldElement::from_bytes(y, Self::PRIME);
+    pub fn new(x: Option<&[u8]>, y: Option<&[u8]>) -> Self {
         let a = FieldElement::from_bytes(Self::A, Self::PRIME);
         let b = FieldElement::from_bytes(Self::B, Self::PRIME);
 
-        S256Point(Point::new(Some(gx), Some(gy), a, b))
+        match (x, y) {
+            (Some(x), Some(y)) => {
+                let gx = FieldElement::from_bytes(x, Self::PRIME);
+                let gy = FieldElement::from_bytes(y, Self::PRIME);
+
+                S256Point(Point::new(Some(gx), Some(gy), a, b))
+            }
+            (None, None) => S256Point(Point::new(None, None, a, b)),
+            _ => panic!("Incomplete point coordinates"),
+        }
+    }
+
+    pub fn generator() -> Self {
+        S256Point::new(Some(Self::G_X), Some(Self::G_Y))
     }
 
     pub fn get_point(&self) -> &Point {
