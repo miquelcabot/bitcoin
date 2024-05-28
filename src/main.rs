@@ -1,10 +1,10 @@
 mod field_element;
 mod point;
-mod secp256k1;
+mod s256point;
 
 use crate::field_element::FieldElement;
 use crate::point::Point;
-use crate::secp256k1::Secp256k1;
+use crate::s256point::S256Point;
 use num_bigint::BigUint;
 
 fn main() {
@@ -67,11 +67,11 @@ fn main() {
     println!("{}", z.clone() * BigUint::from(7u32));
     println!("{}", BigUint::from(7u32) * z.clone());
 
-    // secp256k1
-    let secp256k1: Secp256k1 = Secp256k1::new();
-    println!("{}", secp256k1.get_point());
-    println!("{}", secp256k1.get_point().clone() * BigUint::from(2u32));
+    // S256Point
+    let s256point: S256Point = S256Point::new(S256Point::G_X, S256Point::G_Y);
+    println!("{}", s256point.get_point());
+    println!("{}", s256point.get_point().clone() * BigUint::from(2u32));
 
-    let n = BigUint::parse_bytes(Secp256k1::BASE_ORDER, 16).unwrap();
-    println!("{}", secp256k1.get_point().clone() * n);
+    let n = BigUint::parse_bytes(S256Point::BASE_ORDER, 16).unwrap();
+    println!("{}", s256point.get_point().clone() * n);
 }

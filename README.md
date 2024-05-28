@@ -14,14 +14,14 @@ bitcoin = "0.1.0"
 ## Usage
 
 ```rust
-use secp256k1::Secp256k1;
+use s256point::S256Point;
 
 fn main() {
-    let secp256k1: Secp256k1 = Secp256k1::new();
-    println!("{}", secp256k1.get_point());
-    println!("{}", secp256k1.get_point().clone() * BigUint::from(2u32));
+    let s256point: S256Point = S256Point::new();
+    println!("{}", s256point.get_point());
+    println!("{}", s256point.get_point().clone() * BigUint::from(2u32));
 
-    let n = BigUint::parse_bytes(Secp256k1::BASE_ORDER, 16).unwrap();
-    println!("{}", secp256k1.get_point().clone() * n);
+    let n = BigUint::parse_bytes(S256Point::BASE_ORDER, 16).unwrap();
+    println!("{}", s256point.get_point().clone() * n);
 }
 ```
