@@ -170,7 +170,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn test_from_int_panic() {
-        FieldElement::from_int(32, 31).unwrap();
+        FieldElement::from_int(32, 31);
     }
 
     #[test]
@@ -204,8 +204,7 @@ mod tests {
         FieldElement::from_bytes(
             b"5a3028a13c7c5b0b455c155198de1a4b3a75a9009b972cd17577c0bd6a3a0949",
             b"070f0ce418c335ec6faadba16b3dc01273ac8260966d4cb8bb15d4f33b8aa055",
-        )
-        .unwrap();
+        );
     }
 
     #[test]
