@@ -2,6 +2,8 @@
 
 This is a simple implementation of the secp256k1 elliptic curve in Rust. It is a work in progress and is not intended for production use. The goal is to implement the elliptic curve and the digital signature algorithm (ECDSA) used in Bitcoin.
 
+This project is based on the book "Programming Bitcoin" by Jimmy Song.
+
 ## Installation
 
 Add this to your `Cargo.toml`:
