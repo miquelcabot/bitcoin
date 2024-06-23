@@ -1,7 +1,8 @@
 use num_bigint::BigUint;
 use std::{
-    fmt::Display,
+    fmt::{Display, Error},
     ops::{Add, Div, Mul, Sub},
+    process::Output,
 };
 
 #[derive(Debug, Clone)]
@@ -11,34 +12,33 @@ pub struct FieldElement {
 }
 
 impl FieldElement {
-    // Constructs a new FieldElement, ensuring the value is within the field range
-    pub fn from_int(number: u32, prime: u32) -> FieldElement {
+    pub fn from_int(number: u32, prime: u32) -> Result<FieldElement, String> {
         if number >= prime {
-            panic!(
+            return Err(format!(
                 "Num {} not in field range 0 to {}",
                 number,
                 prime - BigUint::from(1u32)
-            );
+            ));
         }
 
-        FieldElement {
+        Ok(FieldElement {
             number: BigUint::from(number),
             prime: BigUint::from(prime),
-        }
+        })
     }
 
-    pub fn from_bytes(number: &[u8], prime: &[u8]) -> FieldElement {
+    pub fn from_bytes(number: &[u8], prime: &[u8]) -> Result<FieldElement, String> {
         let number = BigUint::parse_bytes(number, 16).unwrap();
         let prime = BigUint::parse_bytes(prime, 16).unwrap();
         if number >= prime {
-            panic!(
+            return Err(format!(
                 "Num {} not in field range 0 to {}",
                 number,
                 prime - BigUint::from(1u32)
-            );
+            ));
         }
 
-        FieldElement { number, prime }
+        Ok(FieldElement { number, prime })
     }
 
     pub fn get_number(&self) -> &BigUint {
@@ -72,50 +72,50 @@ impl PartialEq for FieldElement {
 
 // Adds two FieldElement values
 impl Add for FieldElement {
-    type Output = Self;
+    type Output = Result<Self, String>;
 
-    fn add(self, other: Self) -> Self {
+    fn add(self, other: Self) -> Self::Output {
         if self.prime != other.prime {
-            panic!("Cannot operate with two numbers in different Fields");
+            return Err("Cannot operate with two numbers in different Fields".to_string());
         }
 
-        FieldElement {
+        Ok(FieldElement {
             number: (&self.number + &other.number) % &self.prime,
             prime: self.prime.clone(),
-        }
+        })
     }
 }
 
 // Subtracts two FieldElement values
 impl Sub for FieldElement {
-    type Output = Self;
+    type Output = Result<Self, String>;
 
-    fn sub(self, other: Self) -> Self {
+    fn sub(self, other: Self) -> Self::Output {
         if self.prime != other.prime {
-            panic!("Cannot operate with two numbers in different Fields");
+            return Err("Cannot operate with two numbers in different Fields".to_string());
         }
 
-        FieldElement {
+        Ok(FieldElement {
             // Ensuring positive result
             number: (&self.number + &self.prime - &other.number) % &self.prime,
             prime: self.prime.clone(),
-        }
+        })
     }
 }
 
 // Multiplies two FieldElement values
 impl Mul<Self> for FieldElement {
-    type Output = Self;
+    type Output = Result<Self, String>;
 
-    fn mul(self, other: Self) -> Self {
+    fn mul(self, other: Self) -> Self::Output {
         if self.prime != other.prime {
-            panic!("Cannot operate with two numbers in different Fields");
+            return Err("Cannot operate with two numbers in different Fields".to_string());
         }
 
-        FieldElement {
+        Ok(FieldElement {
             number: (&self.number * &other.number) % &self.prime,
             prime: self.prime.clone(),
-        }
+        })
     }
 }
 
@@ -141,21 +141,21 @@ impl Mul<FieldElement> for u32 {
 
 // Divides one FieldElement by another using Fermat's Little Theorem
 impl Div for FieldElement {
-    type Output = Self;
+    type Output = Result<Self, String>;
 
-    fn div(self, other: Self) -> Self {
+    fn div(self, other: Self) -> Self::Output {
         if self.prime != other.prime {
-            panic!("Cannot operate with two numbers in different Fields");
+            return Err("Cannot operate with two numbers in different Fields".to_string());
         }
         // Calculate other's multiplicative inverse using Fermat's Little Theorem
         let inv = &other
             .number
             .modpow(&(&self.prime - BigUint::from(2u32)), &self.prime);
         let num = (&self.number * inv) % &self.prime;
-        FieldElement {
+        Ok(FieldElement {
             number: num,
             prime: self.prime.clone(),
-        }
+        })
     }
 }
 
