@@ -1,6 +1,9 @@
 use num_bigint::BigUint;
-use std::fmt::Display;
-use std::ops::{Add, Div, Mul, Sub};
+use std::{
+    fmt::{Display, Error},
+    ops::{Add, Div, Mul, Sub},
+    process::Output,
+};
 
 #[derive(Debug, Clone)]
 pub struct FieldElement {
@@ -162,7 +165,7 @@ mod tests {
 
     #[test]
     fn test_from_int() {
-        let a = FieldElement::from_int(2, 31).unwrap();
+        let a = FieldElement::from_int(2, 31);
         assert_eq!(a.number, BigUint::from(2u32));
         assert_eq!(a.prime, BigUint::from(31u32));
     }
@@ -178,8 +181,7 @@ mod tests {
         let a = FieldElement::from_bytes(
             b"5a3028a13c7c5b0b455c155198de1a4b3a75a9009b972cd17577c0bd6a3a0949",
             b"f70f0ce418c335ec6faadba16b3dc01273ac8260966d4cb8bb15d4f33b8aa055",
-        )
-        .unwrap();
+        );
         assert_eq!(
             a.number,
             BigUint::parse_bytes(
@@ -220,24 +222,22 @@ mod tests {
 
     #[test]
     fn test_add() {
-        let a = FieldElement::from_int(2, 31).unwrap();
-        let b = FieldElement::from_int(15, 31).unwrap();
+        let a = FieldElement::from_int(2, 31);
+        let b = FieldElement::from_int(15, 31);
         assert_eq!(a + b, FieldElement::from_int(17, 31));
-        let a = FieldElement::from_int(17, 31).unwrap();
-        let b = FieldElement::from_int(21, 31).unwrap();
+        let a = FieldElement::from_int(17, 31);
+        let b = FieldElement::from_int(21, 31);
         assert_eq!(a + b, FieldElement::from_int(7, 31));
 
         let prime = b"f70f0ce418c335ec6faadba16b3dc01273ac8260966d4cb8bb15d4f33b8aa055";
         let a = FieldElement::from_bytes(
             b"5a3028a13c7c5b0b455c155198de1a4b3a75a9009b972cd17577c0bd6a3a0949",
             prime,
-        )
-        .unwrap();
+        );
         let b = FieldElement::from_bytes(
             b"c23051f0a7a42d04bd25d1d4f65b4e51a365d8df764ea0ad02f8f576008dec00",
             prime,
-        )
-        .unwrap();
+        );
         println!("{:x}", a.get_number());
         println!("{:x}", b.get_number());
         println!("{}", a.get_prime());
@@ -252,40 +252,40 @@ mod tests {
 
     #[test]
     fn test_sub() {
-        let a = FieldElement::from_int(29, 31).unwrap();
-        let b = FieldElement::from_int(4, 31).unwrap();
+        let a = FieldElement::from_int(29, 31);
+        let b = FieldElement::from_int(4, 31);
         assert_eq!(a - b, FieldElement::from_int(25, 31));
-        let a = FieldElement::from_int(15, 31).unwrap();
-        let b = FieldElement::from_int(30, 31).unwrap();
+        let a = FieldElement::from_int(15, 31);
+        let b = FieldElement::from_int(30, 31);
         assert_eq!(a - b, FieldElement::from_int(16, 31));
     }
 
     #[test]
     fn test_mul() {
-        let a = FieldElement::from_int(24, 31).unwrap();
-        let b = FieldElement::from_int(19, 31).unwrap();
+        let a = FieldElement::from_int(24, 31);
+        let b = FieldElement::from_int(19, 31);
         assert_eq!(a * b, FieldElement::from_int(22, 31));
     }
 
     #[test]
     fn test_scalarmul() {
-        let a = FieldElement::from_int(24, 31).unwrap();
-        assert_eq!(2 * a.clone(), (a.clone() + a.clone()).unwrap());
+        let a = FieldElement::from_int(24, 31);
+        assert_eq!(2 * a.clone(), a.clone() + a.clone());
     }
 
     #[test]
     fn test_pow() {
-        let a = FieldElement::from_int(17, 31).unwrap();
-        assert_eq!(a.pow(3u32), FieldElement::from_int(15, 31).unwrap());
-        let a = FieldElement::from_int(5, 31).unwrap();
-        let b = FieldElement::from_int(18, 31).unwrap();
+        let a = FieldElement::from_int(17, 31);
+        assert_eq!(a.pow(3u32), FieldElement::from_int(15, 31));
+        let a = FieldElement::from_int(5, 31);
+        let b = FieldElement::from_int(18, 31);
         assert_eq!(a.pow(5u32) * b, FieldElement::from_int(16, 31));
     }
 
     #[test]
     fn test_div() {
-        let a = FieldElement::from_int(3, 31).unwrap();
-        let b = FieldElement::from_int(24, 31).unwrap();
+        let a = FieldElement::from_int(3, 31);
+        let b = FieldElement::from_int(24, 31);
         assert_eq!(a / b, FieldElement::from_int(4, 31));
     }
 }

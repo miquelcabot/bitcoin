@@ -39,9 +39,7 @@ impl Point {
     ) -> Self {
         match (&x, &y) {
             (Some(x_val), Some(y_val)) => {
-                let a_mul_x = (a.clone() * x_val.clone()).unwrap();
-                let a_mul_x_plus_b = (a_mul_x + b.clone()).unwrap();
-                if y_val.pow(2u32) != (x_val.pow(3u32) + a_mul_x_plus_b).unwrap() {
+                if y_val.pow(2u32) != x_val.pow(3u32) + a.clone() * x_val.clone() + b.clone() {
                     panic!("({}, {}) is not on the curve", x_val, y_val);
                 }
             }
@@ -93,22 +91,18 @@ impl Add for Point {
                 }
                 // Handling the doubling case
                 if self == other {
-                    let num = (3 * x1.clone().pow(2u32) + self.a.clone()).unwrap();
+                    let num = 3 * x1.clone().pow(2u32) + self.a.clone();
                     let denom = 2 * self.y.as_ref().unwrap().clone();
-                    let s = (num / denom).unwrap();
-                    let x3 = (s.pow(2u32) - 2 * x1.clone()).unwrap();
-                    let x1_minus_x3 = (x1.clone() - x3.clone()).unwrap();
-                    let y3 = ((s * x1_minus_x3).unwrap() - self.y.unwrap()).unwrap();
+                    let s = num / denom;
+                    let x3 = s.pow(2u32) - 2 * x1.clone();
+                    let y3 = s * (x1.clone() - x3.clone()) - self.y.as_ref().unwrap().clone();
                     return Point::new(Some(x3), Some(y3), self.a, self.b);
                 }
             }
             (Some(x1), Some(x2)) => {
-                let s = ((other.y.unwrap() - self.y.clone().unwrap()).unwrap()
-                    / (x2.clone() - x1.clone()).unwrap())
-                .unwrap();
-                let x3 = ((s.pow(2u32) - x1.clone()).unwrap() - x2.clone()).unwrap();
-                let x1_minus_x3 = (x1.clone() - x3.clone()).unwrap();
-                let y3 = ((s * x1_minus_x3).unwrap() - self.y.unwrap()).unwrap();
+                let s = (other.y.unwrap() - self.y.clone().unwrap()) / (x2.clone() - x1.clone());
+                let x3 = s.pow(2u32) - x1.clone() - x2.clone();
+                let y3 = s * (x1.clone() - x3.clone()) - self.y.unwrap();
                 return Point::new(Some(x3), Some(y3), self.a, self.b);
             }
         }
@@ -149,20 +143,20 @@ mod tests {
     #[test]
     fn test_new() {
         let prime = 223;
-        let a = FieldElement::from_int(0, prime).unwrap();
-        let b = FieldElement::from_int(7, prime).unwrap();
+        let a = FieldElement::from_int(0, prime);
+        let b = FieldElement::from_int(7, prime);
         let valid_points = vec![
             (
-                FieldElement::from_int(192, prime).unwrap(),
-                FieldElement::from_int(105, prime).unwrap(),
+                FieldElement::from_int(192, prime),
+                FieldElement::from_int(105, prime),
             ),
             (
-                FieldElement::from_int(17, prime).unwrap(),
-                FieldElement::from_int(56, prime).unwrap(),
+                FieldElement::from_int(17, prime),
+                FieldElement::from_int(56, prime),
             ),
             (
-                FieldElement::from_int(1, prime).unwrap(),
-                FieldElement::from_int(193, prime).unwrap(),
+                FieldElement::from_int(1, prime),
+                FieldElement::from_int(193, prime),
             ),
         ];
         for (x, y) in valid_points {
@@ -186,10 +180,10 @@ mod tests {
     fn test_new_panic() {
         let prime = 223;
         Point::new(
-            Some(FieldElement::from_int(200, prime).unwrap()),
-            Some(FieldElement::from_int(119, prime).unwrap()),
-            FieldElement::from_int(0, prime).unwrap(),
-            FieldElement::from_int(7, prime).unwrap(),
+            Some(FieldElement::from_int(200, prime)),
+            Some(FieldElement::from_int(119, prime)),
+            FieldElement::from_int(0, prime),
+            FieldElement::from_int(7, prime),
         );
     }
 
@@ -197,17 +191,17 @@ mod tests {
     fn test_display() {
         let prime = 223;
         let a = Point::new(
-            Some(FieldElement::from_int(192, prime).unwrap()),
-            Some(FieldElement::from_int(105, prime).unwrap()),
-            FieldElement::from_int(0, prime).unwrap(),
-            FieldElement::from_int(7, prime).unwrap(),
+            Some(FieldElement::from_int(192, prime)),
+            Some(FieldElement::from_int(105, prime)),
+            FieldElement::from_int(0, prime),
+            FieldElement::from_int(7, prime),
         );
         assert_eq!(format!("{}", a), "Point(192,105)_0_7 in F_223");
         let b = Point::new(
             None,
             None,
-            FieldElement::from_int(0, prime).unwrap(),
-            FieldElement::from_int(7, prime).unwrap(),
+            FieldElement::from_int(0, prime),
+            FieldElement::from_int(7, prime),
         );
         assert_eq!(format!("{}", b), "Point(infinity)");
     }
@@ -215,17 +209,17 @@ mod tests {
     #[test]
     fn test_eq() {
         let prime = 223;
-        let a = FieldElement::from_int(0, prime).unwrap();
-        let b = FieldElement::from_int(7, prime).unwrap();
+        let a = FieldElement::from_int(0, prime);
+        let b = FieldElement::from_int(7, prime);
         let p1 = Point::new(
-            Some(FieldElement::from_int(192, prime).unwrap()),
-            Some(FieldElement::from_int(105, prime).unwrap()),
+            Some(FieldElement::from_int(192, prime)),
+            Some(FieldElement::from_int(105, prime)),
             a.clone(),
             b.clone(),
         );
         let p2 = Point::new(
-            Some(FieldElement::from_int(192, prime).unwrap()),
-            Some(FieldElement::from_int(105, prime).unwrap()),
+            Some(FieldElement::from_int(192, prime)),
+            Some(FieldElement::from_int(105, prime)),
             a,
             b,
         );
@@ -235,8 +229,8 @@ mod tests {
     #[test]
     fn test_add() {
         let prime = 223;
-        let a = FieldElement::from_int(0, prime).unwrap();
-        let b = FieldElement::from_int(7, prime).unwrap();
+        let a = FieldElement::from_int(0, prime);
+        let b = FieldElement::from_int(7, prime);
 
         let additions = vec![
             (192, 105, 17, 56, 170, 142),
@@ -247,16 +241,16 @@ mod tests {
         ];
 
         for (x1_raw, y1_raw, x2_raw, y2_raw, x3_raw, y3_raw) in additions {
-            let x1 = FieldElement::from_int(x1_raw, prime).unwrap();
-            let y1 = FieldElement::from_int(y1_raw, prime).unwrap();
+            let x1 = FieldElement::from_int(x1_raw, prime);
+            let y1 = FieldElement::from_int(y1_raw, prime);
             let p1 = Point::new(Some(x1), Some(y1), a.clone(), b.clone());
 
-            let x2 = FieldElement::from_int(x2_raw, prime).unwrap();
-            let y2 = FieldElement::from_int(y2_raw, prime).unwrap();
+            let x2 = FieldElement::from_int(x2_raw, prime);
+            let y2 = FieldElement::from_int(y2_raw, prime);
             let p2 = Point::new(Some(x2), Some(y2), a.clone(), b.clone());
 
-            let x3 = FieldElement::from_int(x3_raw, prime).unwrap();
-            let y3 = FieldElement::from_int(y3_raw, prime).unwrap();
+            let x3 = FieldElement::from_int(x3_raw, prime);
+            let y3 = FieldElement::from_int(y3_raw, prime);
             let p3 = Point::new(Some(x3), Some(y3), a.clone(), b.clone());
 
             assert_eq!(p1.clone() + p2.clone(), p3);
@@ -266,8 +260,8 @@ mod tests {
     #[test]
     fn test_rmul() {
         let prime = 223;
-        let a = FieldElement::from_int(0, prime).unwrap();
-        let b = FieldElement::from_int(7, prime).unwrap();
+        let a = FieldElement::from_int(0, prime);
+        let b = FieldElement::from_int(7, prime);
 
         let multiplications = vec![
             (2, 192, 105, Some(49), Some(71)),
@@ -279,14 +273,14 @@ mod tests {
         ];
 
         for (s, x1_raw, y1_raw, x2_raw, y2_raw) in multiplications {
-            let x1 = FieldElement::from_int(x1_raw, prime).unwrap();
-            let y1 = FieldElement::from_int(y1_raw, prime).unwrap();
+            let x1 = FieldElement::from_int(x1_raw, prime);
+            let y1 = FieldElement::from_int(y1_raw, prime);
             let p1 = Point::new(Some(x1), Some(y1), a.clone(), b.clone());
 
             let p2 = match (x2_raw, y2_raw) {
                 (Some(x2), Some(y2)) => {
-                    let x2 = FieldElement::from_int(x2, prime).unwrap();
-                    let y2 = FieldElement::from_int(y2, prime).unwrap();
+                    let x2 = FieldElement::from_int(x2, prime);
+                    let y2 = FieldElement::from_int(y2, prime);
                     Point::new(Some(x2), Some(y2), a.clone(), b.clone())
                 }
                 _ => Point::new(None, None, a.clone(), b.clone()),

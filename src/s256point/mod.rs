@@ -18,13 +18,13 @@ impl S256Point {
         b"483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8";
 
     pub fn new(x: Option<&[u8]>, y: Option<&[u8]>) -> Self {
-        let a = FieldElement::from_bytes(Self::A, Self::PRIME).unwrap();
-        let b = FieldElement::from_bytes(Self::B, Self::PRIME).unwrap();
+        let a = FieldElement::from_bytes(Self::A, Self::PRIME);
+        let b = FieldElement::from_bytes(Self::B, Self::PRIME);
 
         match (x, y) {
             (Some(x), Some(y)) => {
-                let gx = FieldElement::from_bytes(x, Self::PRIME).unwrap();
-                let gy = FieldElement::from_bytes(y, Self::PRIME).unwrap();
+                let gx = FieldElement::from_bytes(x, Self::PRIME);
+                let gy = FieldElement::from_bytes(y, Self::PRIME);
 
                 S256Point(Point::new(Some(gx), Some(gy), a, b))
             }
