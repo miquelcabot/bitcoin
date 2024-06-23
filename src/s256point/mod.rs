@@ -1,5 +1,8 @@
+use num_bigint::BigUint;
+
 use crate::field_element::FieldElement;
 use crate::point::Point;
+use crate::signature::Signature;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct S256Point(Point);
@@ -39,5 +42,15 @@ impl S256Point {
 
     pub fn get_point(&self) -> &Point {
         &self.0
+    }
+
+    pub fn verify(&self, z: BigUint, signature: Signature) -> bool {
+        let base_order = BigUint::parse_bytes(Self::BASE_ORDER, 16).unwrap();
+        let s_inv = signature.get_s().modpow(&(&base_order - 2u32), &base_order);
+        let u = (&z * &s_inv) % &base_order;
+        let v = (signature.get_r() * &s_inv) % &base_order;
+        let total =
+            (u * S256Point::generator().get_point().clone()) + (v * self.get_point().clone());
+        total.get_x().unwrap().get_number() == signature.get_r()
     }
 }
