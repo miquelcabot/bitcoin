@@ -8,11 +8,8 @@ pub struct Signature {
 }
 
 impl Signature {
-    pub fn from_int(r: u32, s: u32) -> Signature {
-        Signature {
-            r: BigUint::from(r),
-            s: BigUint::from(s),
-        }
+    pub fn new(r: BigUint, s: BigUint) -> Signature {
+        Signature { r, s }
     }
 
     pub fn from_bytes(r: &[u8], s: &[u8]) -> Signature {

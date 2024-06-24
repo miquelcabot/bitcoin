@@ -86,4 +86,10 @@ fn main() {
     let px = b"04519fac3d910ca7e7138f7013706f619fa8f033e6ec6e09370ea38cee6a7574";
     let py = b"82b51eab8c27c66e26c858a079bcdf4f1ada34cec420cafc7eac1a42216fb6c4";
     let point = S256Point::new(Some(px), Some(py));
+
+    // Private key
+    let private_key =
+        PrivateKey::new(b"5a3028a13c7c5b0b455c155198de1a4b3a75a9009b972cd17577c0bd6a3a0949");
+    println!("Private Key: {}", private_key);
+    println!("Signature: {}", private_key.sign(b"55"));
 }
