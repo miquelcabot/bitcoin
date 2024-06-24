@@ -1,10 +1,12 @@
 mod field_element;
 mod point;
+mod private_key;
 mod s256point;
 mod signature;
 
 use crate::field_element::FieldElement;
 use crate::point::Point;
+use crate::private_key::PrivateKey;
 use crate::s256point::S256Point;
 use crate::signature::Signature;
 use num_bigint::BigUint;
