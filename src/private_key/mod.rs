@@ -31,7 +31,7 @@ impl PrivateKey {
 
     pub fn sign(&self, z: &[u8]) -> Signature {
         let mut rng = rand::thread_rng();
-        let k = Self::generate_random_secret();
+        let k = generate_random_number(S256Point::BASE_ORDER);
         let r = (S256Point::generator().get_point().clone() * k.clone())
             .get_x()
             .unwrap()
@@ -48,23 +48,6 @@ impl PrivateKey {
 
         Signature::new(r, s)
     }
-
-    fn generate_random_secret() -> BigUint {
-        let mut rng = rand::thread_rng();
-
-        let mut secret: [u8; 32] = [0u8; 32];
-        rng.fill_bytes(&mut secret);
-
-        let mut s = BigUint::from_bytes_be(&secret);
-
-        let base_order = BigUint::parse_bytes(S256Point::BASE_ORDER, 16).unwrap();
-        while s >= base_order {
-            rng.fill_bytes(&mut secret);
-            s = BigUint::from_bytes_be(&secret);
-        }
-
-        s
-    }
 }
 
 impl Display for PrivateKey {
@@ -77,4 +60,21 @@ impl PartialEq for PrivateKey {
     fn eq(&self, other: &Self) -> bool {
         self.secret == other.secret
     }
+}
+
+fn generate_random_number(max: &[u8]) -> BigUint {
+    let mut rng = rand::thread_rng();
+
+    let mut secret: [u8; 32] = [0u8; 32];
+    rng.fill_bytes(&mut secret);
+
+    let mut s = BigUint::from_bytes_be(&secret);
+
+    let max = BigUint::parse_bytes(max, 16).unwrap();
+    while s >= max {
+        rng.fill_bytes(&mut secret);
+        s = BigUint::from_bytes_be(&secret);
+    }
+
+    s
 }
