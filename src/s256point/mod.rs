@@ -4,6 +4,7 @@ use crate::field_element::FieldElement;
 use crate::point::Point;
 use crate::signature::Signature;
 
+/// Elliptic curve point on secp256k1
 #[derive(Debug, Clone, PartialEq)]
 pub struct S256Point(Point);
 
@@ -20,6 +21,12 @@ impl S256Point {
     pub const G_Y: &'static [u8; 64] =
         b"483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8";
 
+    /// Creates a new S256Point from x and y coordinates
+    /// # Arguments
+    /// * `x` - The x coordinate of the point
+    /// * `y` - The y coordinate of the point
+    /// # Returns
+    /// * `S256Point` - The S256Point created from the coordinates
     pub fn new(x: Option<&[u8]>, y: Option<&[u8]>) -> Self {
         let a = FieldElement::from_bytes(Self::A, Self::PRIME);
         let b = FieldElement::from_bytes(Self::B, Self::PRIME);
@@ -36,14 +43,24 @@ impl S256Point {
         }
     }
 
+    /// Returns the generator point of the curve
+    /// # Returns
+    /// * `S256Point` - The generator point of the curve
     pub fn generator() -> Self {
         S256Point::new(Some(Self::G_X), Some(Self::G_Y))
     }
 
+    /// Returns the point
     pub fn get_point(&self) -> &Point {
         &self.0
     }
 
+    /// Verifies a signature
+    /// # Arguments
+    /// * `z` - The hash of the message
+    /// * `signature` - The signature to verify
+    /// # Returns
+    /// * `bool` - True if the signature is valid, false otherwise
     pub fn verify(&self, z: BigUint, signature: Signature) -> bool {
         let base_order = BigUint::parse_bytes(Self::BASE_ORDER, 16).unwrap();
         let s_inv = signature.get_s().modpow(&(&base_order - 2u32), &base_order);
