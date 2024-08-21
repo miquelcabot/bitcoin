@@ -4,6 +4,9 @@ use std::{
     ops::{Add, Div, Mul, Sub},
 };
 
+/// FieldElement represents a number in a finite field defined by a prime number.
+/// The number is always less than the prime number.
+/// The operations are defined in the finite field.
 #[derive(Debug, Clone)]
 pub struct FieldElement {
     number: BigUint,
@@ -11,7 +14,15 @@ pub struct FieldElement {
 }
 
 impl FieldElement {
-    // Constructs a new FieldElement, ensuring the value is within the field range
+    /// Creates a new FieldElement from a number and a prime number
+    /// The number must be less than the prime number
+    /// # Arguments
+    /// * `number` - A number in the finite field
+    /// * `prime` - The prime number that defines the finite field
+    /// # Panics
+    /// If the number is greater than or equal to the prime number
+    /// # Returns
+    /// * `FieldElement` - The FieldElement created from the number
     pub fn from_int(number: u32, prime: u32) -> FieldElement {
         if number >= prime {
             panic!(
@@ -27,6 +38,15 @@ impl FieldElement {
         }
     }
 
+    /// Creates a new FieldElement from a byte array and a prime number
+    /// The number must be less than the prime number
+    /// # Arguments
+    /// * `number` - A number in the finite field
+    /// * `prime` - The prime number that defines the finite field
+    /// # Panics
+    /// If the number is greater than or equal to the prime number
+    /// # Returns
+    /// * `FieldElement` - The FieldElement created from the byte array
     pub fn from_bytes(number: &[u8], prime: &[u8]) -> FieldElement {
         let number = BigUint::parse_bytes(number, 16).unwrap();
         let prime = BigUint::parse_bytes(prime, 16).unwrap();
@@ -41,14 +61,25 @@ impl FieldElement {
         FieldElement { number, prime }
     }
 
+    /// Returns the number of the FieldElement
+    /// # Returns
+    /// * `BigUint` - The number of the FieldElement
     pub fn get_number(&self) -> &BigUint {
         &self.number
     }
 
+    /// Returns the prime number of the FieldElement
+    /// # Returns
+    /// * `BigUint` - The prime number of the FieldElement
     pub fn get_prime(&self) -> &BigUint {
         &self.prime
     }
 
+    /// Returns the power of the FieldElement to the exponent
+    /// # Arguments
+    /// * `exponent` - The exponent to raise the FieldElement to
+    /// # Returns
+    /// * `FieldElement` - The FieldElement raised to the exponent
     pub fn pow(&self, exponent: impl Into<BigUint>) -> Self {
         let n = &exponent.into() % (&self.prime - BigUint::from(1u32));
         FieldElement {
@@ -58,12 +89,14 @@ impl FieldElement {
     }
 }
 
+// Formats the FieldElement
 impl Display for FieldElement {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "FieldElement({} in F_{})", self.number, self.prime)
     }
 }
 
+// Compares two FieldElement values
 impl PartialEq for FieldElement {
     fn eq(&self, other: &Self) -> bool {
         self.number == other.number && self.prime == other.prime
@@ -131,6 +164,7 @@ impl Mul<u32> for FieldElement {
     }
 }
 
+// Multiplies a scalar by a FieldElement
 impl Mul<FieldElement> for u32 {
     type Output = FieldElement;
 
