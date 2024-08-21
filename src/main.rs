@@ -1,14 +1,8 @@
-mod field_element;
-mod point;
-mod private_key;
-mod s256point;
-mod signature;
-
-use crate::field_element::FieldElement;
-use crate::point::Point;
-use crate::private_key::PrivateKey;
-use crate::s256point::S256Point;
-use crate::signature::Signature;
+use bitcoin::FieldElement;
+use bitcoin::Point;
+use bitcoin::PrivateKey;
+use bitcoin::S256Point;
+use bitcoin::Signature;
 use num_bigint::BigUint;
 
 fn main() {
