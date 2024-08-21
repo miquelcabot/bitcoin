@@ -1,3 +1,5 @@
+use std::fmt::{Display, Formatter};
+
 use num_bigint::BigUint;
 
 use crate::field_element::FieldElement;
@@ -69,6 +71,21 @@ impl S256Point {
         let total =
             (u * S256Point::generator().get_point().clone()) + (v * self.get_point().clone());
         total.get_x().unwrap().get_number() == signature.get_r()
+    }
+}
+
+// Formats the S256Point
+impl Display for S256Point {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        match &self.0.get_x() {
+            None => write!(f, "S256Point(infinity)"),
+            Some(x) => write!(
+                f,
+                "S256Point({},{})",
+                x.get_number(),
+                self.0.get_y().as_ref().unwrap().get_number()
+            ),
+        }
     }
 }
 
