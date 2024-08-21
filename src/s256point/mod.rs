@@ -99,10 +99,14 @@ impl Mul<BigUint> for S256Point {
         let coef = coefficient % n;
 
         let res = self.0 * coef;
-        S256Point::new(
-            Some(&res.get_x().unwrap().get_number().to_bytes_be()),
-            Some(&res.get_y().unwrap().get_number().to_bytes_be()),
-        )
+
+        match res.get_x() {
+            None => S256Point::new(None, None),
+            Some(_) => S256Point::new(
+                Some(&res.get_x().unwrap().get_number().to_bytes_be()),
+                Some(&res.get_y().unwrap().get_number().to_bytes_be()),
+            ),
+        }
     }
 }
 
@@ -165,5 +169,12 @@ mod tests {
             let z = BigUint::parse_bytes(z, 16).unwrap();
             assert!(point.verify(z, signature));
         }
+    }
+
+    #[test]
+    fn test_mul_base_order_to_generator() {
+        let n = BigUint::parse_bytes(S256Point::BASE_ORDER, 16).unwrap();
+        let point = S256Point::generator();
+        assert_eq!(point * n, S256Point::new(None, None));
     }
 }
