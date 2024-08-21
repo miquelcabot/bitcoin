@@ -5,6 +5,7 @@ use std::{
     ops::{Add, Mul},
 };
 
+/// Point represents a point on an elliptic curve
 #[derive(Debug, Clone)]
 pub struct Point {
     x: Option<FieldElement>,
@@ -14,23 +15,44 @@ pub struct Point {
 }
 
 impl Point {
+    /// Returns the x coordinate of the point
+    /// # Returns
+    /// * `Option<&FieldElement>` - The x coordinate of the point
     pub fn get_x(&self) -> Option<&FieldElement> {
         self.x.as_ref()
     }
 
+    /// Returns the y coordinate of the point
+    /// # Returns
+    /// * `Option<&FieldElement>` - The y coordinate of the point
     pub fn get_y(&self) -> Option<&FieldElement> {
         self.y.as_ref()
     }
 
+    /// Returns the a parameter of the curve
+    /// # Returns
+    /// * `&FieldElement` - The a parameter of the curve
     pub fn get_a(&self) -> &FieldElement {
         &self.a
     }
 
+    /// Returns the b parameter of the curve
+    /// # Returns
+    /// * `&FieldElement` - The b parameter of the curve
     pub fn get_b(&self) -> &FieldElement {
         &self.b
     }
 
-    // Constructs a new Point
+    /// Creates a new Point from x and y coordinates and the curve parameters a and b
+    /// # Arguments
+    /// * `x` - The x coordinate of the point
+    /// * `y` - The y coordinate of the point
+    /// * `a` - The a parameter of the curve
+    /// * `b` - The b parameter of the curve
+    /// # Panics
+    /// If the point is not on the curve
+    /// # Returns
+    /// * `Point` - The Point created from the coordinates
     pub fn new(
         x: Option<FieldElement>,
         y: Option<FieldElement>,
@@ -50,6 +72,7 @@ impl Point {
     }
 }
 
+// Formats the Point
 impl Display for Point {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         match &self.x {
@@ -67,6 +90,7 @@ impl Display for Point {
     }
 }
 
+// Comparing two points
 impl PartialEq for Point {
     fn eq(&self, other: &Self) -> bool {
         self.x == other.x && self.y == other.y && self.a == other.a && self.b == other.b
@@ -110,6 +134,7 @@ impl Add for Point {
     }
 }
 
+// Point multiplication
 impl Mul<BigUint> for Point {
     type Output = Self;
 
@@ -128,6 +153,7 @@ impl Mul<BigUint> for Point {
     }
 }
 
+// Point multiplication
 impl Mul<Point> for BigUint {
     type Output = Point;
 
