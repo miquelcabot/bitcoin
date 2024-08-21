@@ -67,7 +67,7 @@ fn main() {
 
     // S256Point
     let s256point: S256Point = S256Point::generator();
-    println!("{}", s256point.get_point());
+    println!("{}", s256point);
     println!("{}", s256point.get_point().clone() * BigUint::from(2u32));
 
     let n = BigUint::parse_bytes(S256Point::BASE_ORDER, 16).unwrap();
