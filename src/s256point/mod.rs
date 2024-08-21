@@ -1,4 +1,5 @@
 use std::fmt::{Display, Formatter};
+use std::ops::Mul;
 
 use num_bigint::BigUint;
 
@@ -86,6 +87,31 @@ impl Display for S256Point {
                 self.0.get_y().as_ref().unwrap().get_number()
             ),
         }
+    }
+}
+
+// S256Point multiplication
+impl Mul<BigUint> for S256Point {
+    type Output = S256Point;
+
+    fn mul(self, coefficient: BigUint) -> S256Point {
+        let n = BigUint::parse_bytes(S256Point::BASE_ORDER, 16).unwrap();
+        let coef = coefficient % n;
+
+        let res = self.0 * coef;
+        S256Point::new(
+            Some(&res.get_x().unwrap().get_number().to_bytes_be()),
+            Some(&res.get_y().unwrap().get_number().to_bytes_be()),
+        )
+    }
+}
+
+// S256Point multiplication
+impl Mul<S256Point> for BigUint {
+    type Output = S256Point;
+
+    fn mul(self, point: S256Point) -> S256Point {
+        point * self
     }
 }
 
