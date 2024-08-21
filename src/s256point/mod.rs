@@ -13,7 +13,7 @@ impl S256Point {
     pub const B: &'static [u8; 1] = b"7";
     pub const BASE_ORDER: &'static [u8; 64] =
         b"fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141";
-    // prime = 2^256 - 2^32 - 977
+    // prime = 2^256 - 2^32 - 2^9 - 2^8 - 2^7 - 2^6 - 2^4 - 1 = 2^256 - 2^32 - 977
     pub const PRIME: &'static [u8; 64] =
         b"fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f";
     pub const G_X: &'static [u8; 64] =
