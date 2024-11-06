@@ -30,7 +30,7 @@ impl PrivateKey {
     }
 
     pub fn sign(&self, z: &[u8]) -> Signature {
-        let mut rng = rand::thread_rng();
+        let _rng = rand::thread_rng();
         let k = generate_random_number(S256Point::BASE_ORDER);
         let r = (S256Point::generator().get_point().clone() * k.clone())
             .get_x()
