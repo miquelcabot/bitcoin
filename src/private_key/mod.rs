@@ -6,6 +6,7 @@ use crate::point::Point;
 use crate::s256point::S256Point;
 use crate::signature::Signature;
 
+/// PrivateKey represents a private key in the elliptic curve cryptography.
 #[derive(Debug, Clone)]
 pub struct PrivateKey {
     secret: BigUint,
@@ -13,6 +14,11 @@ pub struct PrivateKey {
 }
 
 impl PrivateKey {
+    /// Creates a new PrivateKey from a byte array.
+    /// # Arguments
+    /// * `secret` - A byte array representing the private key
+    /// # Returns
+    /// * `PrivateKey` - The PrivateKey created from the byte array
     pub fn new(secret: &[u8]) -> PrivateKey {
         let secret = BigUint::parse_bytes(secret, 16).unwrap();
         PrivateKey {
@@ -21,14 +27,25 @@ impl PrivateKey {
         }
     }
 
+    /// Returns the secret of the private key.
+    /// # Returns
+    /// * `&BigUint` - The secret of the private key
     pub fn get_secret(&self) -> &BigUint {
         &self.secret
     }
 
+    /// Returns the point of the private key.
+    /// # Returns
+    /// * `&Point` - The point of the private key
     pub fn get_point(&self) -> &Point {
         &self.point
     }
 
+    /// Signs a message with the private key.
+    /// # Arguments
+    /// * `z` - A byte array representing the message to sign
+    /// # Returns
+    /// * `Signature` - The signature of the message
     pub fn sign(&self, z: &[u8]) -> Signature {
         let _rng = rand::thread_rng();
         let k = generate_random_number(S256Point::BASE_ORDER);
