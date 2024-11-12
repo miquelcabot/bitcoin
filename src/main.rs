@@ -3,9 +3,17 @@ use bitcoin::FieldElement;
 use bitcoin::Point;
 use bitcoin::PrivateKey;
 use bitcoin::S256Point;
+use figlet_rs::FIGfont;
 
 #[tokio::main]
 async fn main() {
+    let standard_font = FIGfont::standard().unwrap();
+
+    let figure = standard_font
+        .convert("Bitcoin")
+        .expect("Failed to generate ASCII art");
+    println!("{}", figure);
+
     // FieldElement
     let prime = b"f70f0ce418c335ec6faadba16b3dc01273ac8260966d4cb8bb15d4f33b8aa055";
     let x = b"5a3028a13c7c5b0b455c155198de1a4b3a75a9009b972cd17577c0bd6a3a0949";

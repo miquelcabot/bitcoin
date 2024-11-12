@@ -42,6 +42,7 @@ dependencies = [
 name = "bitcoin"
 version = "0.1.0"
 dependencies = [
+ "figlet-rs",
  "num-bigint",
  "rand",
  "sha2",
@@ -109,6 +110,12 @@ dependencies = [
  "block-buffer",
  "crypto-common",
 ]
+
+[[package]]
+name = "figlet-rs"
+version = "0.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4742a071cd9694fc86f9fa1a08fa3e53d40cc899d7ee532295da2d085639fbc5"
 
 [[package]]
 name = "generic-array"
