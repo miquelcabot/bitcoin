@@ -1,8 +1,8 @@
+use bitcoin::BigUint;
 use bitcoin::FieldElement;
 use bitcoin::Point;
 use bitcoin::PrivateKey;
 use bitcoin::S256Point;
-use num_bigint::BigUint;
 
 fn main() {
     // FieldElement

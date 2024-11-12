@@ -9,3 +9,4 @@ pub use crate::point::Point;
 pub use crate::private_key::PrivateKey;
 pub use crate::s256point::S256Point;
 pub use crate::signature::Signature;
+pub use num_bigint::BigUint;
