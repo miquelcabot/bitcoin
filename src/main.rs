@@ -3,16 +3,41 @@ use bitcoin::FieldElement;
 use bitcoin::Point;
 use bitcoin::PrivateKey;
 use bitcoin::S256Point;
+use dialoguer::{theme::ColorfulTheme, Select};
 use figlet_rs::FIGfont;
 
 #[tokio::main]
 async fn main() {
+    // Generate ASCII art
     let standard_font = FIGfont::standard().unwrap();
-
     let figure = standard_font
         .convert("Bitcoin")
         .expect("Failed to generate ASCII art");
     println!("{}", figure);
+
+    // Menu options
+    let options = vec!["Option 1", "Option 2", "Option 3", "Exit"];
+
+    // Loop to keep the menu active until "Exit" is selected
+    loop {
+        let selection = Select::with_theme(&ColorfulTheme::default())
+            .with_prompt("Select an option:")
+            .items(&options)
+            .default(0)
+            .interact()
+            .unwrap();
+
+        match selection {
+            0 => println!("You selected Option 1"),
+            1 => println!("You selected Option 2"),
+            2 => println!("You selected Option 3"),
+            3 => {
+                println!("Exiting...");
+                break; // Exit the loop if "Exit" is selected
+            }
+            _ => println!("Invalid option"),
+        }
+    }
 
     // FieldElement
     let prime = b"f70f0ce418c335ec6faadba16b3dc01273ac8260966d4cb8bb15d4f33b8aa055";
