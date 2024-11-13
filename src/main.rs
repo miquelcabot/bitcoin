@@ -3,7 +3,7 @@ use bitcoin::FieldElement;
 use bitcoin::Point;
 use bitcoin::PrivateKey;
 use bitcoin::S256Point;
-use dialoguer::{theme::ColorfulTheme, Select};
+use dialoguer::{theme::ColorfulTheme, Input, Select};
 use figlet_rs::FIGfont;
 
 #[tokio::main]
@@ -28,7 +28,12 @@ async fn main() {
             .unwrap();
 
         match selection {
-            0 => println!("You selected Option 1"),
+            0 => {
+                // Call the function to request a BigUint
+                if let Some(big_integer) = request_big_integer_hex() {
+                    println!("BigUint: {}", big_integer);
+                }
+            }
             1 => println!("You selected Option 2"),
             2 => println!("You selected Option 3"),
             3 => {
@@ -119,4 +124,20 @@ async fn main() {
         PrivateKey::new(b"5a3028a13c7c5b0b455c155198de1a4b3a75a9009b972cd17577c0bd6a3a0949");
     println!("Private Key: {}", private_key);
     println!("Signature: {}", private_key.sign(b"55"));
+}
+
+// Function to request a BigUint in hexadecimal from the user
+fn request_big_integer_hex() -> Option<BigUint> {
+    let input: String = Input::new()
+        .with_prompt("Enter a large integer in hexadecimal format")
+        .interact_text()
+        .expect("Failed to read input");
+
+    match BigUint::parse_bytes(input.as_bytes(), 16) {
+        Some(value) => Some(value),
+        None => {
+            println!("Invalid hexadecimal number format. Returning to menu.");
+            None
+        }
+    }
 }
