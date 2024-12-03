@@ -16,7 +16,7 @@ async fn main() {
     println!("{}", figure);
 
     // Menu options
-    let options = vec!["Option 1", "Option 2", "Option 3", "Exit"];
+    let options = vec!["Convert Hexadecimal to Decimal", "Exit"];
 
     // Loop to keep the menu active until "Exit" is selected
     loop {
@@ -28,15 +28,8 @@ async fn main() {
             .unwrap();
 
         match selection {
-            0 => {
-                // Call the function to request a BigUint
-                if let Some(big_integer) = request_big_integer_hex() {
-                    println!("BigUint: {}", big_integer);
-                }
-            }
-            1 => println!("You selected Option 2"),
-            2 => println!("You selected Option 3"),
-            3 => {
+            0 => convert_hex_to_dec(),
+            1 => {
                 println!("Exiting...");
                 break; // Exit the loop if "Exit" is selected
             }
@@ -127,17 +120,14 @@ async fn main() {
 }
 
 // Function to request a BigUint in hexadecimal from the user
-fn request_big_integer_hex() -> Option<BigUint> {
+fn convert_hex_to_dec() {
     let input: String = Input::new()
         .with_prompt("Enter a large integer in hexadecimal format")
         .interact_text()
         .expect("Failed to read input");
 
     match BigUint::parse_bytes(input.as_bytes(), 16) {
-        Some(value) => Some(value),
-        None => {
-            println!("Invalid hexadecimal number format. Returning to menu.");
-            None
-        }
+        Some(num) => println!("Decimal: {}", num),
+        None => println!("Invalid hexadecimal number format"),
     }
 }
