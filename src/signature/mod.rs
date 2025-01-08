@@ -38,3 +38,44 @@ impl PartialEq for Signature {
         self.r == other.r && self.s == other.s
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::PrivateKey;
+
+    use super::*;
+
+    #[test]
+    fn test_private_key_creation() {
+        let secret = b"1234567890abcdef1234567890abcdef";
+        let private_key = PrivateKey::new(secret);
+        assert_eq!(
+            private_key.get_secret(),
+            &BigUint::parse_bytes(secret, 16).unwrap()
+        );
+    }
+
+    #[test]
+    fn test_private_key_display() {
+        let secret = b"1234567890abcdef1234567890abcdef";
+        let private_key = PrivateKey::new(secret);
+        assert_eq!(
+            format!("{}", private_key),
+            format!(
+                "PrivateKey({:0>64x})",
+                BigUint::parse_bytes(secret, 16).unwrap()
+            )
+        );
+    }
+
+    #[test]
+    fn test_private_key_equality() {
+        let secret1 = b"1234567890abcdef1234567890abcdef";
+        let secret2 = b"fedcba0987654321fedcba0987654321";
+        let private_key1 = PrivateKey::new(secret1);
+        let private_key2 = PrivateKey::new(secret1);
+        let private_key3 = PrivateKey::new(secret2);
+        assert_eq!(private_key1, private_key2);
+        assert_ne!(private_key1, private_key3);
+    }
+}
