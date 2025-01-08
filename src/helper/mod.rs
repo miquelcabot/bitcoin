@@ -31,9 +31,11 @@ mod tests {
         let hash = hash256(data);
         assert_eq!(
             hash,
-            BigUint::from_bytes_be(
-                b"bc62d4b80d9e36da29c16c5d4d9f11731f36052c72401a76c23c0fb5a9b74423"
+            BigUint::parse_bytes(
+                b"bc62d4b80d9e36da29c16c5d4d9f11731f36052c72401a76c23c0fb5a9b74423",
+                16
             )
+            .unwrap()
         );
     }
 }
