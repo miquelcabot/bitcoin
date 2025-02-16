@@ -1,14 +1,9 @@
-mod field_element;
-mod helper;
-mod point;
-mod private_key;
-mod s256point;
-mod signature;
+mod cryptography;
 
-pub use crate::field_element::FieldElement;
-pub use crate::helper::hash256;
-pub use crate::point::Point;
-pub use crate::private_key::PrivateKey;
-pub use crate::s256point::S256Point;
-pub use crate::signature::Signature;
+pub use cryptography::hash256;
+pub use cryptography::FieldElement;
+pub use cryptography::Point;
+pub use cryptography::PrivateKey;
+pub use cryptography::S256Point;
+pub use cryptography::Signature;
 pub use num_bigint::BigUint;

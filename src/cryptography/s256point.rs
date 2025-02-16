@@ -3,9 +3,9 @@ use std::ops::Mul;
 
 use num_bigint::BigUint;
 
-use crate::field_element::FieldElement;
-use crate::point::Point;
-use crate::signature::Signature;
+use super::FieldElement;
+use super::Point;
+use super::Signature;
 
 /// Elliptic curve point on secp256k1
 #[derive(Debug, Clone, PartialEq)]

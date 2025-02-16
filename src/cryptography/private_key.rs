@@ -2,9 +2,9 @@ use num_bigint::BigUint;
 use rand::prelude::*;
 use std::fmt::Display;
 
-use crate::point::Point;
-use crate::s256point::S256Point;
-use crate::signature::Signature;
+use super::Point;
+use super::S256Point;
+use super::Signature;
 
 /// PrivateKey represents a private key in the elliptic curve cryptography.
 #[derive(Debug, Clone)]
