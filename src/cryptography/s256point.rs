@@ -107,6 +107,20 @@ impl S256Point {
             _ => panic!("Point at infinity cannot be serialized"),
         }
     }
+
+    /// Returns the SEC format of the point in string format
+    /// # Arguments
+    /// * `compressed` - Whether to use compressed format
+    /// # Returns
+    /// * `String` - The SEC format encoding of the point in string format
+    pub fn sec_str(&self, compressed: bool) -> String {
+        let hex: String = self
+            .sec(compressed)
+            .iter()
+            .map(|b| format!("{:02x}", b))
+            .collect();
+        format!("0x{}", hex)
+    }
 }
 
 // Formats the S256Point
@@ -233,5 +247,28 @@ mod tests {
     fn test_sec_infinity() {
         let point = S256Point::new(None, None);
         point.sec(true);
+    }
+
+    #[test]
+    fn test_sec_str_compressed() {
+        let point = S256Point::generator();
+        let sec_str = point.sec_str(true);
+        assert!(sec_str.starts_with("0x02") || sec_str.starts_with("0x03"));
+        assert_eq!(sec_str.len(), 68);
+    }
+
+    #[test]
+    fn test_sec_str_uncompressed() {
+        let point = S256Point::generator();
+        let sec_str = point.sec_str(false);
+        assert!(sec_str.starts_with("0x04"));
+        assert_eq!(sec_str.len(), 132);
+    }
+
+    #[test]
+    #[should_panic(expected = "Point at infinity cannot be serialized")]
+    fn test_sec_str_infinity() {
+        let point = S256Point::new(None, None);
+        point.sec_str(true);
     }
 }
