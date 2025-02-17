@@ -73,6 +73,40 @@ impl S256Point {
             (u * S256Point::generator().get_point().clone()) + (v * self.get_point().clone());
         total.get_x().unwrap().get_number() == signature.get_r()
     }
+
+    /// Returns the SEC format of the point
+    /// # Arguments
+    /// * `compressed` - Whether to use compressed format
+    /// # Returns
+    /// * `Vec<u8>` - The SEC format encoding of the point
+    pub fn sec(&self, compressed: bool) -> Vec<u8> {
+        match (self.0.get_x(), self.0.get_y()) {
+            (Some(x), Some(y)) => {
+                let x_bytes = x.get_number().to_bytes_be();
+                let y_bytes = y.get_number().to_bytes_be();
+
+                if compressed {
+                    let prefix = if y.get_number() % 2u32 == BigUint::from(0u32) {
+                        0x02
+                    } else {
+                        0x03
+                    };
+                    let mut result = vec![prefix];
+                    result.extend(vec![0; 32 - x_bytes.len()]); // Ensure 32 bytes
+                    result.extend(x_bytes);
+                    result
+                } else {
+                    let mut result = vec![0x04];
+                    result.extend(vec![0; 32 - x_bytes.len()]); // Ensure 32 bytes
+                    result.extend(x_bytes);
+                    result.extend(vec![0; 32 - y_bytes.len()]); // Ensure 32 bytes
+                    result.extend(y_bytes);
+                    result
+                }
+            }
+            _ => panic!("Point at infinity cannot be serialized"),
+        }
+    }
 }
 
 // Formats the S256Point
@@ -176,5 +210,28 @@ mod tests {
         let n = BigUint::parse_bytes(S256Point::BASE_ORDER, 16).unwrap();
         let point = S256Point::generator();
         assert_eq!(point * n, S256Point::new(None, None));
+    }
+
+    #[test]
+    fn test_sec_compressed() {
+        let point = S256Point::generator();
+        let sec_bytes = point.sec(true);
+        assert_eq!(sec_bytes.len(), 33);
+        assert!(sec_bytes[0] == 0x02 || sec_bytes[0] == 0x03);
+    }
+
+    #[test]
+    fn test_sec_uncompressed() {
+        let point = S256Point::generator();
+        let sec_bytes = point.sec(false);
+        assert_eq!(sec_bytes.len(), 65);
+        assert_eq!(sec_bytes[0], 0x04);
+    }
+
+    #[test]
+    #[should_panic(expected = "Point at infinity cannot be serialized")]
+    fn test_sec_infinity() {
+        let point = S256Point::new(None, None);
+        point.sec(true);
     }
 }
