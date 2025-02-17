@@ -27,6 +27,17 @@ impl PrivateKey {
         }
     }
 
+    /// Generates a random PrivateKey.
+    /// # Returns
+    /// * `PrivateKey` - A randomly generated private key
+    pub fn random() -> PrivateKey {
+        let secret = generate_random_number(S256Point::BASE_ORDER);
+        PrivateKey {
+            secret: secret.clone(),
+            point: S256Point::generator().get_point().clone() * secret,
+        }
+    }
+
     /// Returns the secret of the private key.
     /// # Returns
     /// * `&BigUint` - The secret of the private key
@@ -108,6 +119,14 @@ mod tests {
             private_key.get_secret(),
             &BigUint::parse_bytes(secret, 16).unwrap()
         );
+    }
+
+    #[test]
+    fn test_private_key_random() {
+        let private_key1 = PrivateKey::random();
+        let private_key2 = PrivateKey::random();
+
+        assert_ne!(private_key1, private_key2);
     }
 
     #[test]
