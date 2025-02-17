@@ -13,7 +13,11 @@ async fn main() {
     println!("{}", figure);
 
     // Menu options
-    let options = vec!["Convert Hexadecimal to Decimal", "Exit"];
+    let options = vec![
+        "Convert Hexadecimal to Decimal",
+        "Generate a random private key",
+        "Exit",
+    ];
 
     // Loop to keep the menu active until "Exit" is selected
     loop {
@@ -26,7 +30,8 @@ async fn main() {
 
         match selection {
             0 => convert_hex_to_dec(),
-            1 => {
+            1 => generate_random_private_key(),
+            2 => {
                 println!("Exiting...");
                 break; // Exit the loop if "Exit" is selected
             }
@@ -40,7 +45,7 @@ async fn main() {
     println!("Signature: {}", private_key.sign(b"55"));
 }
 
-// Function to request a BigUint in hexadecimal from the user
+// Request a BigUint in hexadecimal from the user
 fn convert_hex_to_dec() {
     let input: String = Input::new()
         .with_prompt("Enter a large integer in hexadecimal format")
@@ -51,4 +56,10 @@ fn convert_hex_to_dec() {
         Some(num) => println!("Decimal: {}", num),
         None => println!("Invalid hexadecimal number format"),
     }
+}
+
+// Generate a random private key
+fn generate_random_private_key() {
+    let private_key = PrivateKey::random();
+    println!("Random Private Key: {}", private_key);
 }
