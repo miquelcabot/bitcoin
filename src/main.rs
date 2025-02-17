@@ -15,7 +15,7 @@ async fn main() {
     // Menu options
     let options = vec![
         "🔢 Convert Hexadecimal to Decimal",
-        "🔑 Generate a random private key",
+        "🔑 Generate a Random Private Key",
         "🚪 Exit",
     ];
 
