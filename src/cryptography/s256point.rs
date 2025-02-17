@@ -114,12 +114,14 @@ impl S256Point {
     /// # Returns
     /// * `String` - The SEC format encoding of the point in string format
     pub fn sec_str(&self, compressed: bool) -> String {
-        let hex: String = self
-            .sec(compressed)
-            .iter()
-            .map(|b| format!("{:02x}", b))
-            .collect();
-        format!("0x{}", hex)
+        let sec_bytes = self.sec(compressed);
+        let mut hex = String::with_capacity(2 + sec_bytes.len() * 2);
+        hex.push_str("0x");
+        for byte in sec_bytes {
+            use std::fmt::Write;
+            write!(&mut hex, "{:02x}", byte).unwrap();
+        }
+        hex
     }
 }
 
