@@ -181,7 +181,7 @@ mod tests {
         let signature = Signature::from_bytes(
             b"37206a0610995c58074999cb9767b87af4c4978db68c06e8e6e81d282047a7c6",
             b"8ca63759c1157ebeaec0d03cecca119fc9a75bf8e6d0fa65c841c8e2738cdaec",
-        );
+        )?;
 
         let point = S256Point::new(
             Some(b"04519fac3d910ca7e7138f7013706f619fa8f033e6ec6e09370ea38cee6a7574"),
@@ -219,7 +219,7 @@ mod tests {
         )?;
 
         for (z, r, s) in signatures {
-            let signature = Signature::from_bytes(r, s);
+            let signature = Signature::from_bytes(r, s)?;
             let z = BigUint::parse_bytes(z, 16).unwrap();
             assert!(point.verify(z, signature));
         }

@@ -1,3 +1,4 @@
+use anyhow::Result;
 use num_bigint::BigUint;
 use std::fmt::Display;
 
@@ -12,10 +13,12 @@ impl Signature {
         Signature { r, s }
     }
 
-    pub fn from_bytes(r: &[u8], s: &[u8]) -> Signature {
-        let r = BigUint::parse_bytes(r, 16).unwrap();
-        let s = BigUint::parse_bytes(s, 16).unwrap();
-        Signature { r, s }
+    pub fn from_bytes(r: &[u8], s: &[u8]) -> Result<Signature> {
+        let r = BigUint::parse_bytes(r, 16)
+            .ok_or_else(|| anyhow::anyhow!("Failed to parse r from bytes"))?;
+        let s = BigUint::parse_bytes(s, 16)
+            .ok_or_else(|| anyhow::anyhow!("Failed to parse s from bytes"))?;
+        Ok(Signature { r, s })
     }
 
     pub fn get_r(&self) -> &BigUint {
