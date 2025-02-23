@@ -86,6 +86,17 @@ impl FieldElement {
             prime: self.prime.clone(),
         }
     }
+
+    /// Returns the square root of the FieldElement if it exists
+    /// # Returns
+    /// * `FieldElement` - The square root of the FieldElement
+    pub fn sqrt(&self) -> Self {
+        let exponent = (&self.prime + BigUint::from(1u32)) / BigUint::from(4u32);
+        FieldElement {
+            number: self.number.modpow(&exponent, &self.prime),
+            prime: self.prime.clone(),
+        }
+    }
 }
 
 // Formats the FieldElement
@@ -318,6 +329,14 @@ mod tests {
         let a = FieldElement::from_int(5, 31)?;
         let b = FieldElement::from_int(18, 31)?;
         assert_eq!(a.pow(5u32) * b, FieldElement::from_int(16, 31)?);
+        Ok(())
+    }
+
+    #[test]
+    fn test_sqrt_exists() -> Result<()> {
+        let a = FieldElement::from_int(4, 7)?; // 4 is a quadratic residue mod 7
+        let sqrt_a = a.sqrt();
+        assert_eq!(sqrt_a.clone() * sqrt_a, a);
         Ok(())
     }
 
