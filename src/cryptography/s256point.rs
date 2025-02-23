@@ -31,13 +31,13 @@ impl S256Point {
     /// # Returns
     /// * `S256Point` - The S256Point created from the coordinates
     pub fn new(x: Option<&[u8]>, y: Option<&[u8]>) -> Self {
-        let a = FieldElement::from_bytes(Self::A, Self::PRIME);
-        let b = FieldElement::from_bytes(Self::B, Self::PRIME);
+        let a = FieldElement::from_bytes(Self::A, Self::PRIME).unwrap();
+        let b = FieldElement::from_bytes(Self::B, Self::PRIME).unwrap();
 
         match (x, y) {
             (Some(x), Some(y)) => {
-                let gx = FieldElement::from_bytes(x, Self::PRIME);
-                let gy = FieldElement::from_bytes(y, Self::PRIME);
+                let gx = FieldElement::from_bytes(x, Self::PRIME).unwrap();
+                let gy = FieldElement::from_bytes(y, Self::PRIME).unwrap();
 
                 S256Point(Point::new(Some(gx), Some(gy), a, b))
             }
