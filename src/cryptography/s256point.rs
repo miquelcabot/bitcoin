@@ -85,7 +85,7 @@ impl S256Point {
                 let x_bytes = x.get_number().to_bytes_be();
                 let y_bytes = y.get_number().to_bytes_be();
 
-                if compressed {
+                let raw_bytes = if compressed {
                     let prefix = if y.get_number() % 2u32 == BigUint::from(0u32) {
                         0x02
                     } else {
@@ -94,34 +94,25 @@ impl S256Point {
                     let mut result = vec![prefix];
                     result.extend(vec![0; 32 - x_bytes.len()]); // Ensure 32 bytes
                     result.extend(x_bytes);
-                    Ok(result)
+                    result
                 } else {
                     let mut result = vec![0x04];
                     result.extend(vec![0; 32 - x_bytes.len()]); // Ensure 32 bytes
                     result.extend(x_bytes);
                     result.extend(vec![0; 32 - y_bytes.len()]); // Ensure 32 bytes
                     result.extend(y_bytes);
-                    Ok(result)
+                    result
+                };
+
+                // Convert raw_bytes to a hex string in Vec<u8> format
+                let mut hex_bytes = Vec::with_capacity(raw_bytes.len() * 2);
+                for byte in raw_bytes {
+                    hex_bytes.extend_from_slice(format!("{:02x}", byte).as_bytes());
                 }
+                Ok(hex_bytes)
             }
             _ => bail!("Point at infinity cannot be serialized"),
         }
-    }
-
-    /// Returns the SEC format of the point in string format
-    /// # Arguments
-    /// * `compressed` - Whether to use compressed format
-    /// # Returns
-    /// * `String` - The SEC format encoding of the point in string format
-    pub fn to_sec_str(&self, compressed: bool) -> Result<String> {
-        let sec_bytes = self.to_sec(compressed)?;
-        let mut hex = String::with_capacity(2 + sec_bytes.len() * 2);
-        hex.push_str("0x");
-        for byte in sec_bytes {
-            use std::fmt::Write;
-            write!(&mut hex, "{:02x}", byte).unwrap();
-        }
-        Ok(hex)
     }
 }
 
@@ -237,18 +228,18 @@ mod tests {
     #[test]
     fn test_to_sec_compressed() -> Result<()> {
         let point = S256Point::generator();
-        let sec_bytes = point.to_sec(true)?;
-        assert_eq!(sec_bytes.len(), 33);
-        assert!(sec_bytes[0] == 0x02 || sec_bytes[0] == 0x03);
+        let sec_hex_str = point.to_sec(true)?;
+        assert_eq!(sec_hex_str.len(), 66);
+        assert!(sec_hex_str.starts_with(b"02") || sec_hex_str.starts_with(b"03"));
         Ok(())
     }
 
     #[test]
     fn test_to_sec_uncompressed() -> Result<()> {
         let point = S256Point::generator();
-        let sec_bytes = point.to_sec(false)?;
-        assert_eq!(sec_bytes.len(), 65);
-        assert_eq!(sec_bytes[0], 0x04);
+        let sec_hex_str = point.to_sec(false)?;
+        assert_eq!(sec_hex_str.len(), 130);
+        assert!(sec_hex_str.starts_with(b"04"));
         Ok(())
     }
 
@@ -257,30 +248,5 @@ mod tests {
     fn test_to_sec_infinity() {
         let point = S256Point::new(None, None).unwrap();
         point.to_sec(true).unwrap();
-    }
-
-    #[test]
-    fn test_to_sec_str_compressed() -> Result<()> {
-        let point = S256Point::generator();
-        let sec_str = point.to_sec_str(true)?;
-        assert!(sec_str.starts_with("0x02") || sec_str.starts_with("0x03"));
-        assert_eq!(sec_str.len(), 68);
-        Ok(())
-    }
-
-    #[test]
-    fn test_to_sec_str_uncompressed() -> Result<()> {
-        let point = S256Point::generator();
-        let sec_str = point.to_sec_str(false)?;
-        assert!(sec_str.starts_with("0x04"));
-        assert_eq!(sec_str.len(), 132);
-        Ok(())
-    }
-
-    #[test]
-    #[should_panic(expected = "Point at infinity cannot be serialized")]
-    fn test_to_sec_str_infinity() {
-        let point = S256Point::new(None, None).unwrap();
-        point.to_sec_str(true).unwrap();
     }
 }

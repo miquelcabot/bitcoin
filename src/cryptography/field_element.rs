@@ -275,9 +275,6 @@ mod tests {
             b"c23051f0a7a42d04bd25d1d4f65b4e51a365d8df764ea0ad02f8f576008dec00",
             prime,
         )?;
-        println!("{:x}", a.get_number());
-        println!("{:x}", b.get_number());
-        println!("{}", a.get_prime());
         assert_eq!(
             a + b,
             FieldElement::from_bytes(
