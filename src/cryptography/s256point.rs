@@ -1,3 +1,4 @@
+use anyhow::{bail, Result};
 use num_bigint::BigUint;
 use std::fmt::{Display, Formatter};
 use std::ops::Mul;
@@ -29,7 +30,7 @@ impl S256Point {
     /// * `y` - The y coordinate of the point
     /// # Returns
     /// * `S256Point` - The S256Point created from the coordinates
-    pub fn new(x: Option<&[u8]>, y: Option<&[u8]>) -> Self {
+    pub fn new(x: Option<&[u8]>, y: Option<&[u8]>) -> Result<Self> {
         let a = FieldElement::from_bytes(Self::A, Self::PRIME).unwrap();
         let b = FieldElement::from_bytes(Self::B, Self::PRIME).unwrap();
 
@@ -38,10 +39,10 @@ impl S256Point {
                 let gx = FieldElement::from_bytes(x, Self::PRIME).unwrap();
                 let gy = FieldElement::from_bytes(y, Self::PRIME).unwrap();
 
-                S256Point(Point::new(Some(gx), Some(gy), a, b).unwrap())
+                Ok(S256Point(Point::new(Some(gx), Some(gy), a, b)?))
             }
-            (None, None) => S256Point(Point::new(None, None, a, b).unwrap()),
-            _ => panic!("Incomplete point coordinates"),
+            (None, None) => Ok(S256Point(Point::new(None, None, a, b)?)),
+            _ => bail!("Incomplete point coordinates"),
         }
     }
 
@@ -49,7 +50,7 @@ impl S256Point {
     /// # Returns
     /// * `S256Point` - The generator point of the curve
     pub fn generator() -> Self {
-        S256Point::new(Some(Self::G_X), Some(Self::G_Y))
+        S256Point::new(Some(Self::G_X), Some(Self::G_Y)).unwrap()
     }
 
     /// Returns the point
@@ -78,7 +79,7 @@ impl S256Point {
     /// * `compressed` - Whether to use compressed format
     /// # Returns
     /// * `Vec<u8>` - The SEC format encoding of the point
-    pub fn sec(&self, compressed: bool) -> Vec<u8> {
+    pub fn sec(&self, compressed: bool) -> Result<Vec<u8>> {
         match (self.0.get_x(), self.0.get_y()) {
             (Some(x), Some(y)) => {
                 let x_bytes = x.get_number().to_bytes_be();
@@ -93,17 +94,17 @@ impl S256Point {
                     let mut result = vec![prefix];
                     result.extend(vec![0; 32 - x_bytes.len()]); // Ensure 32 bytes
                     result.extend(x_bytes);
-                    result
+                    Ok(result)
                 } else {
                     let mut result = vec![0x04];
                     result.extend(vec![0; 32 - x_bytes.len()]); // Ensure 32 bytes
                     result.extend(x_bytes);
                     result.extend(vec![0; 32 - y_bytes.len()]); // Ensure 32 bytes
                     result.extend(y_bytes);
-                    result
+                    Ok(result)
                 }
             }
-            _ => panic!("Point at infinity cannot be serialized"),
+            _ => bail!("Point at infinity cannot be serialized"),
         }
     }
 
@@ -112,15 +113,15 @@ impl S256Point {
     /// * `compressed` - Whether to use compressed format
     /// # Returns
     /// * `String` - The SEC format encoding of the point in string format
-    pub fn sec_str(&self, compressed: bool) -> String {
-        let sec_bytes = self.sec(compressed);
+    pub fn sec_str(&self, compressed: bool) -> Result<String> {
+        let sec_bytes = self.sec(compressed)?;
         let mut hex = String::with_capacity(2 + sec_bytes.len() * 2);
         hex.push_str("0x");
         for byte in sec_bytes {
             use std::fmt::Write;
             write!(&mut hex, "{:02x}", byte).unwrap();
         }
-        hex
+        Ok(hex)
     }
 }
 
@@ -150,11 +151,12 @@ impl Mul<BigUint> for S256Point {
         let res = self.0 * coef;
 
         match res.get_x() {
-            None => S256Point::new(None, None),
+            None => S256Point::new(None, None).unwrap(),
             Some(_) => S256Point::new(
                 Some(&res.get_x().unwrap().get_number().to_bytes_be()),
                 Some(&res.get_y().unwrap().get_number().to_bytes_be()),
-            ),
+            )
+            .unwrap(),
         }
     }
 }
@@ -170,10 +172,12 @@ impl Mul<S256Point> for BigUint {
 
 #[cfg(test)]
 mod tests {
+    use anyhow::Ok;
+
     use super::*;
 
     #[test]
-    fn test_verify() {
+    fn test_verify() -> Result<()> {
         let signature = Signature::from_bytes(
             b"37206a0610995c58074999cb9767b87af4c4978db68c06e8e6e81d282047a7c6",
             b"8ca63759c1157ebeaec0d03cecca119fc9a75bf8e6d0fa65c841c8e2738cdaec",
@@ -182,7 +186,7 @@ mod tests {
         let point = S256Point::new(
             Some(b"04519fac3d910ca7e7138f7013706f619fa8f033e6ec6e09370ea38cee6a7574"),
             Some(b"82b51eab8c27c66e26c858a079bcdf4f1ada34cec420cafc7eac1a42216fb6c4"),
-        );
+        )?;
 
         let z = BigUint::parse_bytes(
             b"bc62d4b80d9e36da29c16c5d4d9f11731f36052c72401a76c23c0fb5a9b74423",
@@ -191,10 +195,11 @@ mod tests {
         .unwrap();
 
         assert!(point.verify(z, signature));
+        Ok(())
     }
 
     #[test]
-    fn test_verify2() {
+    fn test_verify2() -> Result<()> {
         let signatures: Vec<(&[u8; 64], &[u8; 64], &[u8; 64])> = vec![
             (
                 b"ec208baa0fc1c19f708a9ca96fdeff3ac3f230bb4a7ba4aede4942ad003c0f60",
@@ -211,65 +216,71 @@ mod tests {
         let point = S256Point::new(
             Some(b"887387e452b8eacc4acfde10d9aaf7f6d9a0f975aabb10d006e4da568744d06c"),
             Some(b"61de6d95231cd89026e286df3b6ae4a894a3378e393e93a0f45b666329a0ae34"),
-        );
+        )?;
 
         for (z, r, s) in signatures {
             let signature = Signature::from_bytes(r, s);
             let z = BigUint::parse_bytes(z, 16).unwrap();
             assert!(point.verify(z, signature));
         }
+        Ok(())
     }
 
     #[test]
-    fn test_mul_base_order_to_generator() {
+    fn test_mul_base_order_to_generator() -> Result<()> {
         let n = BigUint::parse_bytes(S256Point::BASE_ORDER, 16).unwrap();
         let point = S256Point::generator();
-        assert_eq!(point * n, S256Point::new(None, None));
+        assert_eq!(point * n, S256Point::new(None, None)?);
+        Ok(())
     }
 
     #[test]
-    fn test_sec_compressed() {
+    fn test_sec_compressed() -> Result<()> {
         let point = S256Point::generator();
-        let sec_bytes = point.sec(true);
+        let sec_bytes = point.sec(true)?;
         assert_eq!(sec_bytes.len(), 33);
         assert!(sec_bytes[0] == 0x02 || sec_bytes[0] == 0x03);
+        Ok(())
     }
 
     #[test]
-    fn test_sec_uncompressed() {
+    fn test_sec_uncompressed() -> Result<()> {
         let point = S256Point::generator();
-        let sec_bytes = point.sec(false);
+        let sec_bytes = point.sec(false)?;
         assert_eq!(sec_bytes.len(), 65);
         assert_eq!(sec_bytes[0], 0x04);
+        Ok(())
     }
 
     #[test]
     #[should_panic(expected = "Point at infinity cannot be serialized")]
     fn test_sec_infinity() {
-        let point = S256Point::new(None, None);
-        point.sec(true);
+        let point = S256Point::new(None, None).unwrap();
+        point.sec(true).unwrap();
     }
 
     #[test]
-    fn test_sec_str_compressed() {
+    fn test_sec_str_compressed() -> Result<()> {
         let point = S256Point::generator();
-        let sec_str = point.sec_str(true);
+        let sec_str = point.sec_str(true)?;
         assert!(sec_str.starts_with("0x02") || sec_str.starts_with("0x03"));
         assert_eq!(sec_str.len(), 68);
+        Ok(())
     }
 
     #[test]
-    fn test_sec_str_uncompressed() {
+    fn test_sec_str_uncompressed() -> Result<()> {
         let point = S256Point::generator();
-        let sec_str = point.sec_str(false);
+        let sec_str = point.sec_str(false)?;
         assert!(sec_str.starts_with("0x04"));
         assert_eq!(sec_str.len(), 132);
+        Ok(())
     }
 
     #[test]
     #[should_panic(expected = "Point at infinity cannot be serialized")]
     fn test_sec_str_infinity() {
-        let point = S256Point::new(None, None);
-        point.sec_str(true);
+        let point = S256Point::new(None, None).unwrap();
+        point.sec_str(true).unwrap();
     }
 }
