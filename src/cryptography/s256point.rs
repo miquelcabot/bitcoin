@@ -39,9 +39,9 @@ impl S256Point {
                 let gx = FieldElement::from_bytes(x, Self::PRIME).unwrap();
                 let gy = FieldElement::from_bytes(y, Self::PRIME).unwrap();
 
-                S256Point(Point::new(Some(gx), Some(gy), a, b))
+                S256Point(Point::new(Some(gx), Some(gy), a, b).unwrap())
             }
-            (None, None) => S256Point(Point::new(None, None, a, b)),
+            (None, None) => S256Point(Point::new(None, None, a, b).unwrap()),
             _ => panic!("Incomplete point coordinates"),
         }
     }
