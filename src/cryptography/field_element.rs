@@ -87,7 +87,7 @@ impl FieldElement {
         }
     }
 
-    /// Returns the square root of the FieldElement if it exists
+    /// Returns the square root of the FieldElement
     /// # Returns
     /// * `FieldElement` - The square root of the FieldElement
     pub fn sqrt(&self) -> Self {
