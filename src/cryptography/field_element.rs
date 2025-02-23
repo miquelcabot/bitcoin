@@ -20,8 +20,6 @@ impl FieldElement {
     /// # Arguments
     /// * `number` - A number in the finite field
     /// * `prime` - The prime number that defines the finite field
-    /// # Panics
-    /// If the number is greater than or equal to the prime number
     /// # Returns
     /// * `FieldElement` - The FieldElement created from the number
     pub fn from_int(number: u32, prime: u32) -> Result<FieldElement> {
@@ -44,8 +42,6 @@ impl FieldElement {
     /// # Arguments
     /// * `number` - A number in the finite field
     /// * `prime` - The prime number that defines the finite field
-    /// # Panics
-    /// If the number is greater than or equal to the prime number
     /// # Returns
     /// * `FieldElement` - The FieldElement created from the byte array
     pub fn from_bytes(number: &[u8], prime: &[u8]) -> Result<FieldElement> {
