@@ -1,7 +1,6 @@
+use num_bigint::BigUint;
 use std::fmt::{Display, Formatter};
 use std::ops::Mul;
-
-use num_bigint::BigUint;
 
 use super::FieldElement;
 use super::Point;

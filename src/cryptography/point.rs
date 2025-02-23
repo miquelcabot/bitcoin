@@ -1,10 +1,11 @@
-use super::FieldElement;
 use anyhow::{bail, Result};
 use num_bigint::BigUint;
 use std::{
     fmt::{Display, Formatter},
     ops::{Add, Mul},
 };
+
+use super::FieldElement;
 
 /// Point represents a point on an elliptic curve
 #[derive(Debug, Clone)]
