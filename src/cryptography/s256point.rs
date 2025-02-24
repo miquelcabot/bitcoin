@@ -114,6 +114,48 @@ impl S256Point {
             _ => bail!("Point at infinity cannot be serialized"),
         }
     }
+
+    /// Parses a SEC hexadecimal encoding and returns an S256Point
+    /// # Arguments
+    /// * `sec_hex` - A byte slice containing the SEC encoding in hex format
+    /// # Returns
+    /// * `Result<Self>` - The point extracted from the SEC encoding
+    pub fn parse(sec_hex: &[u8]) -> Result<Self> {
+        // Convert hexadecimal bytes to a hex string
+        let hex_str = std::str::from_utf8(sec_hex)?;
+
+        match &hex_str[0..2] {
+          "04" => {
+              // Uncompressed SEC format
+              let x = &hex_str[2..66]; // First 64 bytes
+              let y = &hex_str[66..130]; // Last 64 bytes
+              Ok(S256Point::new(Some(x.as_bytes()), Some(y.as_bytes()))?)
+          }
+          "02" | "03" => {
+              // Compressed SEC format
+              let x = FieldElement::from_bytes(&hex_str[2..66].as_bytes(), Self::PRIME)?;
+
+              // Compute y² = x³ + 7
+              let alpha = x.pow(BigUint::from(3u32)) +
+                  FieldElement::from_bytes(Self::B, Self::PRIME)?;
+              let beta = alpha.sqrt(); // Compute sqrt(alpha)
+
+              let prime = BigUint::parse_bytes(Self::PRIME, 16).unwrap();
+              let num = &prime - beta.get_number();
+              let even_beta = if beta.get_number() % 2u32 == BigUint::from(0u32) {
+                  beta
+              } else {
+                  FieldElement::from_bytes(&num.to_bytes_be(), Self::PRIME)?
+              };
+
+              Ok(S256Point::new(
+                  Some(&x.get_number().to_str_radix(16).into_bytes()),
+                  Some(&even_beta.get_number().to_str_radix(16).into_bytes()),
+              )?)
+          }
+          _ => bail!("Invalid SEC format: Only compressed (0x02, 0x03) and uncompressed (0x04) are supported"),
+       }
+    }
 }
 
 // Formats the S256Point
@@ -248,5 +290,25 @@ mod tests {
     fn test_to_sec_infinity() {
         let point = S256Point::new(None, None).unwrap();
         point.to_sec(true).unwrap();
+    }
+
+    #[test]
+    fn test_parse_uncompressed() -> Result<()> {
+        let point = S256Point::generator();
+        let sec_hex_str = point.to_sec(false)?;
+        let parsed_point = S256Point::parse(&sec_hex_str)?;
+        assert_eq!(point, parsed_point);
+        Ok(())
+    }
+
+    #[test]
+    fn test_parse_compressed() -> Result<()> {
+        let point = S256Point::generator();
+        let sec_hex_str = point.to_sec(true)?;
+        let parsed_point = S256Point::parse(&sec_hex_str)?;
+        assert_eq!(point, parsed_point);
+        println!("Parsed point: {}", parsed_point);
+        println!("Original point: {}", point);
+        Ok(())
     }
 }
