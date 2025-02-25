@@ -115,6 +115,16 @@ impl S256Point {
         }
     }
 
+    /// Returns the SEC format of the point in hexadecimal string format
+    /// # Arguments
+    /// * `compressed` - Whether to use compressed format
+    /// # Returns
+    /// * `String` - The SEC format encoding of the point in hexadecimal string format
+    pub fn to_sec_str(&self, compressed: bool) -> Result<String> {
+        let sec_hex = self.to_sec(compressed)?;
+        Ok(std::str::from_utf8(&sec_hex)?.to_string())
+    }
+
     /// Parses a SEC hexadecimal encoding and returns an S256Point
     /// # Arguments
     /// * `sec_hex` - A byte slice containing the SEC encoding in hex format
@@ -133,7 +143,7 @@ impl S256Point {
           }
           "02" | "03" => {
               // Compressed SEC format
-              let x = FieldElement::from_bytes(&hex_str[2..66].as_bytes(), Self::PRIME)?;
+              let x = FieldElement::from_bytes(hex_str[2..66].as_bytes(), Self::PRIME)?;
 
               // Compute y² = x³ + 7
               let alpha = x.pow(BigUint::from(3u32)) +
@@ -290,6 +300,31 @@ mod tests {
     fn test_to_sec_infinity() {
         let point = S256Point::new(None, None).unwrap();
         point.to_sec(true).unwrap();
+    }
+
+    #[test]
+    fn test_to_sec_str_compressed() -> Result<()> {
+        let point = S256Point::generator();
+        let sec_hex_str = point.to_sec_str(true)?;
+        assert_eq!(sec_hex_str.len(), 66);
+        assert!(sec_hex_str.starts_with("02") || sec_hex_str.starts_with("03"));
+        Ok(())
+    }
+
+    #[test]
+    fn test_to_sec_str_uncompressed() -> Result<()> {
+        let point = S256Point::generator();
+        let sec_hex_str = point.to_sec_str(false)?;
+        assert_eq!(sec_hex_str.len(), 130);
+        assert!(sec_hex_str.starts_with("04"));
+        Ok(())
+    }
+
+    #[test]
+    #[should_panic(expected = "Point at infinity cannot be serialized")]
+    fn test_to_sec_str_infinity() {
+        let point = S256Point::new(None, None).unwrap();
+        point.to_sec_str(true).unwrap();
     }
 
     #[test]
