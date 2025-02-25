@@ -2,7 +2,6 @@ use num_bigint::BigUint;
 use rand::prelude::*;
 use std::fmt::Display;
 
-use super::Point;
 use super::S256Point;
 use super::Signature;
 
@@ -10,7 +9,7 @@ use super::Signature;
 #[derive(Debug, Clone)]
 pub struct PrivateKey {
     secret: BigUint,
-    point: Point,
+    point: S256Point,
 }
 
 impl PrivateKey {
@@ -19,23 +18,61 @@ impl PrivateKey {
     /// * `secret` - A byte array representing the private key
     /// # Returns
     /// * `PrivateKey` - The PrivateKey created from the byte array
-    pub fn new(secret: &[u8]) -> PrivateKey {
+    pub fn new(secret: &[u8]) -> anyhow::Result<PrivateKey> {
         let secret = BigUint::parse_bytes(secret, 16).unwrap();
-        PrivateKey {
-            secret: secret.clone(),
-            point: S256Point::generator().get_point().clone() * secret,
-        }
+        let point = S256Point::generator().get_point().clone() * secret.clone();
+        let s256point = S256Point::new(
+            Some(
+                &point
+                    .get_x()
+                    .unwrap()
+                    .get_number()
+                    .to_str_radix(16)
+                    .into_bytes(),
+            ),
+            Some(
+                &point
+                    .get_y()
+                    .unwrap()
+                    .get_number()
+                    .to_str_radix(16)
+                    .into_bytes(),
+            ),
+        )?;
+        Ok(PrivateKey {
+            secret,
+            point: s256point,
+        })
     }
 
     /// Generates a random PrivateKey.
     /// # Returns
     /// * `PrivateKey` - A randomly generated private key
-    pub fn random() -> PrivateKey {
+    pub fn random() -> anyhow::Result<PrivateKey> {
         let secret = generate_random_number(S256Point::BASE_ORDER);
-        PrivateKey {
-            secret: secret.clone(),
-            point: S256Point::generator().get_point().clone() * secret,
-        }
+        let point = S256Point::generator().get_point().clone() * secret.clone();
+        let s256point = S256Point::new(
+            Some(
+                &point
+                    .get_x()
+                    .unwrap()
+                    .get_number()
+                    .to_str_radix(16)
+                    .into_bytes(),
+            ),
+            Some(
+                &point
+                    .get_y()
+                    .unwrap()
+                    .get_number()
+                    .to_str_radix(16)
+                    .into_bytes(),
+            ),
+        )?;
+        Ok(PrivateKey {
+            secret,
+            point: s256point,
+        })
     }
 
     /// Returns the secret of the private key.
@@ -47,8 +84,8 @@ impl PrivateKey {
 
     /// Returns the point of the private key.
     /// # Returns
-    /// * `&Point` - The point of the private key
-    pub fn get_point(&self) -> &Point {
+    /// * `&S256Point` - The point of the private key
+    pub fn get_point(&self) -> &S256Point {
         &self.point
     }
 
@@ -110,29 +147,32 @@ fn generate_random_number(max: &[u8]) -> BigUint {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use anyhow::Result;
 
     #[test]
-    fn test_private_key_creation() {
+    fn test_private_key_creation() -> Result<()> {
         let secret = b"1234567890abcdef1234567890abcdef";
-        let private_key = PrivateKey::new(secret);
+        let private_key = PrivateKey::new(secret)?;
         assert_eq!(
             private_key.get_secret(),
             &BigUint::parse_bytes(secret, 16).unwrap()
         );
+        Ok(())
     }
 
     #[test]
-    fn test_private_key_random() {
-        let private_key1 = PrivateKey::random();
-        let private_key2 = PrivateKey::random();
+    fn test_private_key_random() -> Result<()> {
+        let private_key1 = PrivateKey::random()?;
+        let private_key2 = PrivateKey::random()?;
 
         assert_ne!(private_key1, private_key2);
+        Ok(())
     }
 
     #[test]
-    fn test_private_key_display() {
+    fn test_private_key_display() -> Result<()> {
         let secret = b"1234567890abcdef1234567890abcdef";
-        let private_key = PrivateKey::new(secret);
+        let private_key = PrivateKey::new(secret)?;
         assert_eq!(
             format!("{}", private_key),
             format!(
@@ -140,17 +180,19 @@ mod tests {
                 BigUint::parse_bytes(secret, 16).unwrap()
             )
         );
+        Ok(())
     }
 
     #[test]
-    fn test_private_key_equality() {
+    fn test_private_key_equality() -> Result<()> {
         let secret1 = b"1234567890abcdef1234567890abcdef";
         let secret2 = b"fedcba0987654321fedcba0987654321";
-        let private_key1 = PrivateKey::new(secret1);
-        let private_key2 = PrivateKey::new(secret1);
-        let private_key3 = PrivateKey::new(secret2);
+        let private_key1 = PrivateKey::new(secret1)?;
+        let private_key2 = PrivateKey::new(secret1)?;
+        let private_key3 = PrivateKey::new(secret2)?;
         assert_eq!(private_key1, private_key2);
         assert_ne!(private_key1, private_key3);
+        Ok(())
     }
 
     #[test]
