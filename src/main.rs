@@ -42,8 +42,11 @@ async fn main() {
     let private_key =
         PrivateKey::new(b"5a3028a13c7c5b0b455c155198de1a4b3a75a9009b972cd17577c0bd6a3a0949")
             .unwrap();
-    println!("Private Key: {:?}", private_key);
-    println!("Signature: {:?}", private_key.sign(b"55"));
+    println!(
+        "Private Key: {:?}",
+        private_key.get_point().to_sec_str(true).unwrap()
+    );
+    println!("Signature: {:?}", private_key.sign(b"55").der_str());
 }
 
 // Generate a random private key
