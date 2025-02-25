@@ -147,7 +147,7 @@ fn generate_random_number(max: &[u8]) -> BigUint {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use anyhow::Result;
+    use anyhow::{Ok, Result};
 
     #[test]
     fn test_private_key_creation() -> Result<()> {
@@ -203,5 +203,34 @@ mod tests {
             let random_number = generate_random_number(max);
             assert!(random_number < max_biguint);
         }
+    }
+
+    // Check the compressed SEC format for the public key where the private key secrets are:
+    // - 5,001
+    // - 2,019^5
+    // - 0xdeadbeef54321
+    #[test]
+    fn test_private_key_get_point() -> Result<()> {
+        let private_key1 = &format!("{:X}", 5001u32).into_bytes();
+        let private_key2 = &format!("{:X}", 2019u128.pow(5)).into_bytes();
+        let private_key3 = b"deadbeef54321";
+
+        let private_key1 = PrivateKey::new(&private_key1)?;
+        let private_key2 = PrivateKey::new(&private_key2)?;
+        let private_key3 = PrivateKey::new(private_key3)?;
+
+        assert_eq!(
+            private_key1.get_point().to_sec_str(true)?,
+            "0357a4f368868a8a6d572991e484e664810ff14c05c0fa023275251151fe0e53d1"
+        );
+        assert_eq!(
+            private_key2.get_point().to_sec_str(true)?,
+            "02933ec2d2b111b92737ec12f1c5d20f3233a0ad21cd8b36d0bca7a0cfa5cb8701"
+        );
+        assert_eq!(
+            private_key3.get_point().to_sec_str(true)?,
+            "0296be5b1292f6c856b3c5654e886fc13511462059089cdf9c479623bfcbe77690"
+        );
+        Ok(())
     }
 }
