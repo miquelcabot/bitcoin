@@ -40,15 +40,24 @@ async fn main() {
     }
     // Private key
     let private_key =
-        PrivateKey::new(b"5a3028a13c7c5b0b455c155198de1a4b3a75a9009b972cd17577c0bd6a3a0949");
-    println!("Private Key: {}", private_key);
-    println!("Signature: {}", private_key.sign(b"55"));
+        PrivateKey::new(b"5a3028a13c7c5b0b455c155198de1a4b3a75a9009b972cd17577c0bd6a3a0949")
+            .unwrap();
+    println!("Private Key: {:?}", private_key);
+    println!("Signature: {:?}", private_key.sign(b"55"));
 }
 
 // Generate a random private key
 fn generate_random_private_key() {
-    let private_key = PrivateKey::random();
+    let private_key = PrivateKey::random().unwrap();
     println!("Random Private Key: {}", private_key);
+    println!(
+        "Compressed: {}",
+        private_key.get_point().to_sec_str(true).unwrap()
+    );
+    println!(
+        "Uncompressed: {}",
+        private_key.get_point().to_sec_str(false).unwrap()
+    );
 }
 
 // Request a BigUint in hexadecimal from the user
