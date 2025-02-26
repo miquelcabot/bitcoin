@@ -40,7 +40,7 @@ async fn main() {
     }
     // Private key
     let private_key =
-        PrivateKey::new(b"5a3028a13c7c5b0b455c155198de1a4b3a75a9009b972cd17577c0bd6a3a0949")
+        PrivateKey::from_bytes(b"5a3028a13c7c5b0b455c155198de1a4b3a75a9009b972cd17577c0bd6a3a0949")
             .unwrap();
     println!(
         "Private Key: {:?}",
