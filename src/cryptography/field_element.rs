@@ -18,37 +18,11 @@ impl FieldElement {
     /// Creates a new FieldElement from a number and a prime number
     /// The number must be less than the prime number
     /// # Arguments
-    /// * `number` - A number in the finite field
-    /// * `prime` - The prime number that defines the finite field
+    /// * `number` - A number in the finite field in BigUint format
+    /// * `prime` - The prime number that defines the finite field in BigUint format
     /// # Returns
     /// * `FieldElement` - The FieldElement created from the number
-    pub fn from_int(number: u32, prime: u32) -> Result<FieldElement> {
-        if number >= prime {
-            bail!(
-                "Num {} not in field range 0 to {}",
-                number,
-                prime - BigUint::from(1u32)
-            );
-        }
-
-        Ok(FieldElement {
-            number: BigUint::from(number),
-            prime: BigUint::from(prime),
-        })
-    }
-
-    /// Creates a new FieldElement from a byte array and a prime number
-    /// The number must be less than the prime number
-    /// # Arguments
-    /// * `number` - A number in the finite field
-    /// * `prime` - The prime number that defines the finite field
-    /// # Returns
-    /// * `FieldElement` - The FieldElement created from the byte array
-    pub fn from_bytes(number: &[u8], prime: &[u8]) -> Result<FieldElement> {
-        let number = BigUint::parse_bytes(number, 16)
-            .ok_or_else(|| anyhow::anyhow!("Failed to parse number from bytes"))?;
-        let prime = BigUint::parse_bytes(prime, 16)
-            .ok_or_else(|| anyhow::anyhow!("Failed to parse prime from bytes"))?;
+    pub fn new(number: BigUint, prime: BigUint) -> Result<FieldElement> {
         if number >= prime {
             bail!(
                 "Num {} not in field range 0 to {}",
@@ -58,6 +32,33 @@ impl FieldElement {
         }
 
         Ok(FieldElement { number, prime })
+    }
+
+    /// Creates a new FieldElement from a number and a prime number
+    /// The number must be less than the prime number
+    /// # Arguments
+    /// * `number` - A number in the finite field in u32 format
+    /// * `prime` - The prime number that defines the finite field in u32 format
+    /// # Returns
+    /// * `FieldElement` - The FieldElement created from the number
+    pub fn from_int(number: u32, prime: u32) -> Result<FieldElement> {
+        Self::new(BigUint::from(number), BigUint::from(prime))
+    }
+
+    /// Creates a new FieldElement from a byte array and a prime number
+    /// The number must be less than the prime number
+    /// # Arguments
+    /// * `number` - A number in the finite field in byte array format
+    /// * `prime` - The prime number that defines the finite field in byte array format
+    /// # Returns
+    /// * `FieldElement` - The FieldElement created from the byte array
+    pub fn from_bytes(number: &[u8], prime: &[u8]) -> Result<FieldElement> {
+        let number = BigUint::parse_bytes(number, 16)
+            .ok_or_else(|| anyhow::anyhow!("Failed to parse number from bytes"))?;
+        let prime = BigUint::parse_bytes(prime, 16)
+            .ok_or_else(|| anyhow::anyhow!("Failed to parse prime from bytes"))?;
+
+        Self::new(number, prime)
     }
 
     /// Returns the number of the FieldElement
