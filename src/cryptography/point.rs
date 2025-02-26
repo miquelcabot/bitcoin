@@ -17,6 +17,32 @@ pub struct Point {
 }
 
 impl Point {
+    /// Creates a new Point from x and y coordinates and the curve parameters a and b
+    /// # Arguments
+    /// * `x` - The x coordinate of the point
+    /// * `y` - The y coordinate of the point
+    /// * `a` - The a parameter of the curve
+    /// * `b` - The b parameter of the curve
+    /// # Returns
+    /// * `Point` - The Point created from the coordinates
+    pub fn new(
+        x: Option<FieldElement>,
+        y: Option<FieldElement>,
+        a: FieldElement,
+        b: FieldElement,
+    ) -> Result<Self> {
+        match (&x, &y) {
+            (Some(x_val), Some(y_val)) => {
+                if y_val.pow(2u32) != x_val.pow(3u32) + a.clone() * x_val.clone() + b.clone() {
+                    bail!("({}, {}) is not on the curve", x_val, y_val);
+                }
+            }
+            (None, None) => return Ok(Point { x, y, a, b }),
+            _ => bail!("Incomplete point coordinates"),
+        }
+        Ok(Point { x, y, a, b })
+    }
+
     /// Returns the x coordinate of the point
     /// # Returns
     /// * `Option<&FieldElement>` - The x coordinate of the point
@@ -43,32 +69,6 @@ impl Point {
     /// * `&FieldElement` - The b parameter of the curve
     pub fn get_b(&self) -> &FieldElement {
         &self.b
-    }
-
-    /// Creates a new Point from x and y coordinates and the curve parameters a and b
-    /// # Arguments
-    /// * `x` - The x coordinate of the point
-    /// * `y` - The y coordinate of the point
-    /// * `a` - The a parameter of the curve
-    /// * `b` - The b parameter of the curve
-    /// # Returns
-    /// * `Point` - The Point created from the coordinates
-    pub fn new(
-        x: Option<FieldElement>,
-        y: Option<FieldElement>,
-        a: FieldElement,
-        b: FieldElement,
-    ) -> Result<Self> {
-        match (&x, &y) {
-            (Some(x_val), Some(y_val)) => {
-                if y_val.pow(2u32) != x_val.pow(3u32) + a.clone() * x_val.clone() + b.clone() {
-                    bail!("({}, {}) is not on the curve", x_val, y_val);
-                }
-            }
-            (None, None) => return Ok(Point { x, y, a, b }),
-            _ => bail!("Incomplete point coordinates"),
-        }
-        Ok(Point { x, y, a, b })
     }
 }
 
