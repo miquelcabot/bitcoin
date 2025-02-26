@@ -24,20 +24,22 @@ impl S256Point {
     pub const G_Y: &'static [u8; 64] =
         b"483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8";
 
-    /// Creates a new S256Point from x and y coordinates
+    /// Creates a new S256Point from x and y coordinates in BigUint format
     /// # Arguments
-    /// * `x` - The x coordinate of the point
-    /// * `y` - The y coordinate of the point
+    /// * `x` - The x coordinate of the point in BigUint format
+    /// * `y` - The y coordinate of the point in BigUint format
     /// # Returns
     /// * `S256Point` - The S256Point created from the coordinates
-    pub fn new(x: Option<&[u8]>, y: Option<&[u8]>) -> Result<Self> {
+    pub fn new(x: Option<BigUint>, y: Option<BigUint>) -> Result<Self> {
         let a = FieldElement::from_bytes(Self::A, Self::PRIME).unwrap();
         let b = FieldElement::from_bytes(Self::B, Self::PRIME).unwrap();
 
+        let prime = BigUint::parse_bytes(Self::PRIME, 16)
+            .ok_or_else(|| anyhow::anyhow!("Failed to parse prime from bytes"))?;
         match (x, y) {
             (Some(x), Some(y)) => {
-                let gx = FieldElement::from_bytes(x, Self::PRIME).unwrap();
-                let gy = FieldElement::from_bytes(y, Self::PRIME).unwrap();
+                let gx = FieldElement::new(x, prime.clone()).unwrap();
+                let gy = FieldElement::new(y, prime).unwrap();
 
                 Ok(S256Point(Point::new(Some(gx), Some(gy), a, b)?))
             }
@@ -46,11 +48,35 @@ impl S256Point {
         }
     }
 
+    /// Creates a new S256Point from x and y coordinates in byte slice format
+    /// # Arguments
+    /// * `x` - The x coordinate of the point in byte slice format
+    /// * `y` - The y coordinate of the point
+    /// # Returns
+    /// * `S256Point` - The S256Point created from the coordinates
+    pub fn from_bytes(x: Option<&[u8]>, y: Option<&[u8]>) -> Result<Self> {
+        let x = match x {
+            Some(x) => Some(
+                BigUint::parse_bytes(x, 16)
+                    .ok_or_else(|| anyhow::anyhow!("Failed to parse number from bytes"))?,
+            ),
+            None => None,
+        };
+        let y = match y {
+            Some(y) => Some(
+                BigUint::parse_bytes(y, 16)
+                    .ok_or_else(|| anyhow::anyhow!("Failed to parse number from bytes"))?,
+            ),
+            None => None,
+        };
+        Self::new(x, y)
+    }
+
     /// Returns the generator point of the curve
     /// # Returns
     /// * `S256Point` - The generator point of the curve
     pub fn generator() -> Self {
-        S256Point::new(Some(Self::G_X), Some(Self::G_Y)).unwrap()
+        S256Point::from_bytes(Some(Self::G_X), Some(Self::G_Y)).unwrap()
     }
 
     /// Returns the point
@@ -139,7 +165,7 @@ impl S256Point {
               // Uncompressed SEC format
               let x = &hex_str[2..66]; // First 64 bytes
               let y = &hex_str[66..130]; // Last 64 bytes
-              Ok(S256Point::new(Some(x.as_bytes()), Some(y.as_bytes()))?)
+              Ok(S256Point::from_bytes(Some(x.as_bytes()), Some(y.as_bytes()))?)
           }
           "02" | "03" => {
               // Compressed SEC format
@@ -158,7 +184,7 @@ impl S256Point {
                   FieldElement::from_bytes(&num.to_bytes_be(), Self::PRIME)?
               };
 
-              Ok(S256Point::new(
+              Ok(S256Point::from_bytes(
                   Some(&x.get_number().to_str_radix(16).into_bytes()),
                   Some(&even_beta.get_number().to_str_radix(16).into_bytes()),
               )?)
@@ -195,7 +221,7 @@ impl Mul<BigUint> for S256Point {
 
         match res.get_x() {
             None => S256Point::new(None, None).unwrap(),
-            Some(_) => S256Point::new(
+            Some(_) => S256Point::from_bytes(
                 Some(&res.get_x().unwrap().get_number().to_bytes_be()),
                 Some(&res.get_y().unwrap().get_number().to_bytes_be()),
             )
@@ -226,7 +252,7 @@ mod tests {
             b"8ca63759c1157ebeaec0d03cecca119fc9a75bf8e6d0fa65c841c8e2738cdaec",
         )?;
 
-        let point = S256Point::new(
+        let point = S256Point::from_bytes(
             Some(b"04519fac3d910ca7e7138f7013706f619fa8f033e6ec6e09370ea38cee6a7574"),
             Some(b"82b51eab8c27c66e26c858a079bcdf4f1ada34cec420cafc7eac1a42216fb6c4"),
         )?;
@@ -256,7 +282,7 @@ mod tests {
             ),
         ];
 
-        let point = S256Point::new(
+        let point = S256Point::from_bytes(
             Some(b"887387e452b8eacc4acfde10d9aaf7f6d9a0f975aabb10d006e4da568744d06c"),
             Some(b"61de6d95231cd89026e286df3b6ae4a894a3378e393e93a0f45b666329a0ae34"),
         )?;
