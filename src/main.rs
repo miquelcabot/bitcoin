@@ -46,7 +46,7 @@ async fn main() {
         "Private Key: {:?}",
         private_key.get_point().to_sec_str(true).unwrap()
     );
-    println!("Signature: {:?}", private_key.sign(b"55").der_str());
+    println!("Signature: {:?}", private_key.sign(b"55").to_der_str());
 }
 
 // Generate a random private key

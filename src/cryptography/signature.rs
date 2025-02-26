@@ -31,7 +31,7 @@ impl Signature {
 }
 
 impl Signature {
-    pub fn der(&self) -> Vec<u8> {
+    pub fn to_der(&self) -> Vec<u8> {
         fn encode_integer(value: &BigUint) -> Vec<u8> {
             let mut bin = value.to_bytes_be(); // Convert BigUint to bytes (Big Endian)
             while bin.first() == Some(&0) {
@@ -56,8 +56,8 @@ impl Signature {
         der_encoded
     }
 
-    pub fn der_str(&self) -> String {
-        let der = self.der();
+    pub fn to_der_str(&self) -> String {
+        let der = self.to_der();
         let mut der_str = String::new();
         for byte in der {
             der_str.push_str(&format!("{:02x}", byte));
@@ -137,7 +137,7 @@ mod tests {
         .unwrap();
 
         let signature = Signature::new(r, s);
-        let der_str = signature.der_str();
+        let der_str = signature.to_der_str();
         assert_eq!(
             der_str,
             "3045022037206a0610995c58074999cb9767b87af4c4978db68c06e8e6e81d282047a7c\
