@@ -6,6 +6,7 @@ mod s256point;
 mod signature;
 
 pub use self::field_element::FieldElement;
+pub use self::helper::encode_base58;
 pub use self::helper::hash256;
 pub use self::point::Point;
 pub use self::private_key::PrivateKey;
