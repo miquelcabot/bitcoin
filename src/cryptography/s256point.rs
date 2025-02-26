@@ -3,9 +3,7 @@ use num_bigint::BigUint;
 use std::fmt::{Display, Formatter};
 use std::ops::Mul;
 
-use super::FieldElement;
-use super::Point;
-use super::Signature;
+use super::{encode_base58_checksum, hash160, FieldElement, Point, Signature};
 
 /// Elliptic curve point on secp256k1
 #[derive(Debug, Clone, PartialEq)]
@@ -191,6 +189,28 @@ impl S256Point {
           }
           _ => bail!("Invalid SEC format: Only compressed (0x02, 0x03) and uncompressed (0x04) are supported"),
        }
+    }
+
+    /// Computes the Hash160 (SHA256 followed by RIPEMD160) of the SEC format encoding.
+    /// # Arguments
+    /// * `compressed` - Whether to use compressed SEC format
+    /// # Returns
+    /// * `Vec<u8>` - The Hash160 result
+    pub fn hash160(&self, compressed: bool) -> Result<Vec<u8>> {
+        let sec_bytes = self.to_sec(compressed)?; // Get SEC format
+        Ok(hash160(&sec_bytes)) // Apply Hash160
+    }
+
+    /// Returns the Bitcoin address corresponding to the point.
+    /// # Arguments
+    /// * `compressed` - Whether to use compressed SEC format
+    /// * `testnet` - Whether to use the testnet prefix
+    /// # Returns
+    /// * `Result<String>` - The Bitcoin address in Base58Check format
+    pub fn address(&self, compressed: bool, testnet: bool) -> Result<String> {
+        let h160 = self.hash160(compressed)?;
+        let prefix = if testnet { vec![0x6f] } else { vec![0x00] };
+        encode_base58_checksum(&[prefix, h160].concat()) // Base58Check encoding
     }
 }
 
