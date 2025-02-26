@@ -1,5 +1,6 @@
 use anyhow::Result;
 use num_bigint::BigUint;
+use ripemd::Ripemd160;
 use sha2::{Digest, Sha256};
 
 const BASE58_ALPHABET: &[u8] = b"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
@@ -22,6 +23,21 @@ pub fn hash256(data: &[u8]) -> BigUint {
 
     // Convert the hash to a BigUint
     BigUint::from_bytes_be(&second_round)
+}
+
+/// Compute Hash160: SHA256 followed by RIPEMD160.
+/// # Arguments
+/// * `data` - The byte array to hash
+/// # Returns
+/// * `Vec<u8>` - The resulting 20-byte Hash160 digest
+pub fn hash160(data: &[u8]) -> Vec<u8> {
+    // First apply SHA-256
+    let sha256_hash = Sha256::digest(data);
+
+    // Then apply RIPEMD-160
+    let ripemd160_hash = Ripemd160::digest(sha256_hash);
+
+    ripemd160_hash.to_vec() // Return as Vec<u8>
 }
 
 /// Encode a byte array into a Base58 string.
@@ -60,6 +76,17 @@ pub fn encode_base58(data: &[u8]) -> Result<String> {
     // Add '1' prefix for each leading zero
     let prefix = "1".repeat(count);
     Ok(format!("{}{}", prefix, result))
+}
+
+/// Encode a byte array into a Base58Check string (Base58 with a 4-byte checksum).
+/// # Arguments
+/// * `data` - The byte array to encode
+/// # Returns
+/// * `Result<String>` - The Base58Check encoded string
+pub fn encode_base58_checksum(data: &[u8]) -> Result<String> {
+    let checksum = &hash256(data).to_bytes_be()[..4]; // Take first 4 bytes of the hash
+    let extended_data = [data, checksum].concat(); // Concatenate original data + checksum
+    encode_base58(&extended_data) // Encode using Base58
 }
 
 #[cfg(test)]
